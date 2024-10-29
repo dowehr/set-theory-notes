@@ -1,0 +1,347 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 3}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathcal{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\emph{Material:} WF of $\NN$, Set Recursion on $\NN$ (Sections 3.2, 3.3, 4.5)
+
+\subsection{Well-orderedness}
+
+\begin{definition}
+  A set $X$ is \emph{well-ordered} by a linear order $\preceq \subseteq X \times
+  X$ if for every $\emptyset \neq Y \subseteq X$ there is a least element of
+  $Y$, i.e. $y \in Y$ such that $y \leq x$ for all $x \in Y$.
+\end{definition}
+
+\begin{proposition}
+  $\NN$ is well-ordered by $\leq$.
+\end{proposition}
+\begin{proof}
+  Fix $\emptyset \neq X \subseteq \NN$. And suppose $X$ had no least element. We
+  show that $\{n \in N \mid \forall m \leq n.~m \not\in X\} = \NN$ by induction,
+  i.e. that $X = \emptyset$ after all. For $0$ this boils down to it not being
+  the least element of $Y$, which we have assumed. Thus, suppose all $m \leq n$
+  were not in $B$ and consider $s(n)$. If $s(n) \in X$ then it would be its
+  least element, hence $s(n) \not\in X$ and thus all $m \leq s(n)$ are not in
+  $X$.
+\end{proof}
+
+\subsection{Recursion}
+
+\begin{theorem}[Recursion]
+  Fix $x_0 \in X$ and $h : X \to X$ then there exists a unique function $f :
+  \NN \to X$ such that
+  \[
+    f(0) = x_0 \qquad \qquad f(s(n)) = h(f(n)) \text{ for every } n \in \NN
+  \]
+\end{theorem}
+\begin{proof}
+  \emph{Idea:} Show that we can approximate $f$ to arbitrary $n$ and then take
+  their union.
+
+  We call a function $g : s(n) \to X$ an $n$-germ for $n \in \NN$ if
+  \begin{itemize}
+  \item $g(0) = x_0$ and
+  \item $g(s(m)) = h(g(m))$ for any $m < n$.
+  \end{itemize}
+
+  \begin{description}
+  \item[Existence:] We prove that for every $n \in \NN$, there exists an
+    $n$-germ by induction on $n$.
+    \begin{description}
+    \item[$0$:] Simply take $\{\langle 0, x_0 \rangle\}$.
+    \item[$n \to s(n)$:] Suppose there was an $n$-germ $g : s(n) \to X$.
+      Consider $g^* := g \cup \{\langle s(n), h(g(n)) \rangle\} : s(s(n)) \to X$. Then $g^*$ is
+      an $s(n)$-germ because for any $m < s(n)$, either $m = n$ and $g^*(s(n)) =
+      h(g(n)) = h(g^*(n))$ per construction, or $m < n$ and $g^*(s(m)) = g(s(m))
+      = h(g(m)) = h(g^*(m))$.
+    \end{description}
+  \item[Uniqueness:] We prove that if $n, m \in \NN$ and $g : s(n) \to X$ and $g'
+    : s(m) \to X$ are an $n$- and $m$-germ, respectively, then, setting $k :=
+    n \cap m$, $g \uh s(k) = g' \uh s(k)$. Induction on $k$.
+    \begin{description}
+    \item[$0$:] Then $g(0) = x_0 = g'(0)$, meaning $g \uh 1 = g' \uh 1$.
+    \item[$k \to s(k)$:] Then $g \uh s(s(k)) = g \uh s(k) \cup \{\langle s(k),
+      g(s(k)) \rangle\}$. An analogous decomposition can be made for $g'$. Per
+      IH we know that $g \uh s(k) = g' \uh s(k)$. It remains to show that
+      $g(s(k)) = g'(s(k))$, but
+      \[
+        g(s(k)) = h(g(k)) = h(g'(k)) = g'(s(k)).
+      \]
+    \end{description}
+  \end{description}
+
+  We can now define
+  \[
+    f := \bigcup \{g \subseteq N \times X \mid \exists n \in \NN.~ g \text{ an }
+    n\text{-germ}\} \subseteq N \times X.
+  \]
+  The inner set can be obtained via comprehension.
+  We have to prove various properties of $f$.
+  \begin{description}
+  \item[$f$ a function:] For $n \in \NN$, let $\langle n, x \rangle, \langle n,
+    x' \rangle \in f$. Then there are $m$-germ $g$ and $m'$-germ $g'$ such that
+    $x = g(n)$ and $x' = g'(n)$. By uniqueness, $g(n) = g'(n)$.
+  \item[Equations:] Follows from an induction using the $n$-germ properties.
+  \item[Uniqueness:] Follows from equations and an induction.
+  \end{description}
+\end{proof}
+
+\subsection{Arithmetic}
+
+\begin{definition}
+  For $m \in \NN$ we define $\text{add}_m : \NN \to \NN$ by recursion via
+  \[
+    \text{add}_m(0) := m \qquad \qquad \text{add}_m(s(n)) := s(\text{add}_m(n))
+  \]
+  and combine these into addition $+ : \NN \times \NN \to \NN$ by setting $n + m
+  := \text{add}_m(n)$.
+
+  For $m \in \NN$ we define $\text{mult}_m : \NN \to \NN$ by recursion via
+  \[
+    \text{mult}_m(0) := 0 \qquad \qquad \text{mult}_m(s(n)) := m + \text{mult}_m(n)
+  \]
+  and combine these into multiplication $\cdot : \NN \times \NN \to \NN$ by setting $n \cdot m
+  := \text{mult}_m(n)$.
+\end{definition}
+
+\begin{lemma}
+  If $n < m$ then $a + n < a + m$ for $a \in \NN$.
+\end{lemma}
+\begin{proof}
+  Induction on $a$.
+  \begin{description}
+  \item[$0$:] We know that $0 + n = n < m = 0 + m$.
+  \item[$a + 1$:] We know that $a + n < a + m$. Hence $s(a) + n = s(a + n) < s(a +
+    m) = s(a) + m$.
+  \end{description}
+\end{proof}
+
+\newpage
+
+\section{Lecture 2}
+
+\emph{Material:} Replacement and Foundation (Section 4.5)
+
+\subsection{Replacement}
+
+We would like to be able to define the following function: \emph{See assignment!!}
+\[
+  \Vv_0 := \NN \qquad \qquad \Vv_{s(n)} := \pow(\Vv_n)
+\]
+However, we cannot use recursion as above because we cannot prove that the
+domain of $\Vv$ is a set.
+
+\begin{definition}
+  We fix the following additional axiom:
+  \begin{description}
+  \item[ZF7:] Replacement
+
+    $(\forall x \exists y.~A(x,y) \wedge \forall y'.~A(x, y') \to y = y') \to
+    \forall u \exists v \forall y.~y \in v \leftrightarrow (\exists x \in
+    u.~A(x, y))$ where $A(-)$ has at most two free variables.
+
+    If $A(-)$ is a class-level function then its image on any set $u$ is a set.
+  \end{description}
+\end{definition}
+
+\begin{remark}
+  ZF7 can also be stated using parameters, but as in the exercise class, these
+  can also be handled using the Cartesian product.
+\end{remark}
+
+\begin{proposition}
+  Let $X$ be a set and $A(-)$ be a class-level function on $X$. Then the
+  function described by $A$ exists as $a$ with $\dom(a) = X$.
+\end{proposition}
+\begin{proof}
+  First we obtain the domain $Y$ via replacement. Then take
+  \[
+    a := \{\langle x, y \rangle \in X \times Y \mid A(x, y)\}.
+  \]
+\end{proof}
+
+\begin{example}
+  We can now define a function $A^\bullet$ with:
+  \[ A^0 := \{\emptyset\} \qquad \qquad A^{s(n)} := A \times A^n\]
+  which computes the sets of $n$-tuples of $A$.
+\end{example}
+
+\begin{theorem}[Class recursion]
+  Let $A(-)$ be a formula with two free variables such that
+  \[
+    \forall x \exists y.~A(x, y) \wedge \forall y'.~A(x, y') \to y = y'.
+  \]
+  For any set $x_0$ there exists a unique function $f$ with $\dom(f) = \NN$ such that
+  \[
+    f(0) = x_0 \qquad\qquad A(f(n), f(s(n))) \text{ for every } n \in \NN
+  \]
+\end{theorem}
+\begin{proof}
+  Define an $n$-germ as a function $g$ with domain $s(n)$ and
+  \begin{itemize}
+  \item $g(0) = x_0$ and
+  \item $A(g(m), g(s(m)))$ for every $m < n$.
+  \end{itemize}
+  Prove existence, uniqueness and extension as before. Then define
+  \[
+    f := \bigcup \{g \mid n \in \NN, g \text{ an } n\text{-germ}\}.
+  \]
+  where the inner set exists because of replacement. Then close the proof as
+  before.
+\end{proof}
+
+\subsection{Foundation}
+
+\begin{definition}
+  We fix the following additional axiom:
+  \begin{description}
+  \item[ZF9:] Foundation; \textcolor{red}{Warning! Incorrect in Goldrei!}
+
+    $\forall x \exists y.~x \neq \emptyset \to (y \in x \wedge x \cap y = \emptyset)$
+
+    Every non-empty set is well-founded, i.e.\ contains a $\in$-minimal element.
+  \end{description}
+\end{definition}
+
+\begin{proposition}
+  Let $z$ be a set. Then $z \not\in z$.
+\end{proposition}
+\begin{proof}
+  Consider foundation with $x = \{x\}$, then $x \cap \{x\} = \emptyset$.
+\end{proof}
+
+\begin{theorem}[No infinite chains]
+  Consider a function $f$ with $\dom(f) = \NN$. Then $f$ cannot be an infinite
+  $\in$-chain, i.e.
+  \[\ldots \in f(n) \in \ldots \in f(2) \in f(1) \in f(0).\]
+\end{theorem}
+\begin{proof}
+  Simply apply foundation to $\ran(f)$: There must be $x \in \ran(f)$, and thus an
+  $n \in \NN$ such that $x = f(n)$, such that $f(n) \cap \ran(f) = \emptyset$.
+  But $f(s(n)) \in f(n) \cap \ran(f)$, a contradiction!
+\end{proof}
+
+\begin{remark}
+  With this, we are done! The axioms ZF1-ZF9 are all of Zermelo-Fraenkel set theory.
+\end{remark}
+
+
+% \newpage
+
+% \section{Exercises}
+
+% \begin{exercise}[3.44]
+%   Show that $(m + n) \setminus n \simeq m$.
+% \end{exercise}
+% \begin{proof}
+%   Proof per induction on $m$.
+%   \begin{description}
+%   \item[$m = 0$:] Then $m + n = n$ and $n \setminus n = 0$.
+%   \item[$m \to m + 1$:] Then $s(m) + n = s(m + n)$. We know that $n \subseteq m
+%     + n$. Hence $s(m + n) \setminus n = (m + n) \cup \{m + n\} \setminus n = \{m
+%     + n\} \cup (m + n \setminus n)$. Let $b : m \to m + n \setminus n$ be a
+%     bijection, then we extend it into a bijection $b' : s(m) \to s(m + n)
+%     \setminus n$ via
+%     \[
+%       b'(k) =
+%       \begin{cases}
+%         m + n & k = m \\
+%         b(k) & k < m
+%       \end{cases}.
+%     \]
+%   \end{description}
+% \end{proof}
+
+% \begin{exercise}[4.48]
+%   Show that $\langle x, y \rangle = \{x, \{x, y\}\}$ works. \emph{Hint:} Use foundation.
+% \end{exercise}
+% \begin{proof}
+%   Let $\langle x, y \rangle = \langle a, b \rangle$.
+%   \begin{description}
+%   \item[$x = a$:] We have $x \in \{a, \{a, b\}\}$. Suppose $x = \{a, b\}$ then
+%     $a \in x$. Conversely, we have $a \in \{x, \{x, y\}\}$.
+%     \begin{description}
+%     \item[$a = x$:] Then $x = a \in x$.
+%     \item[$a = \{x, y\}$:] Then $x \in a \in x$.
+%     \end{description}
+%   \item[$y = b$:] We have $\{a, b\} \in \{x, \{x, y\}\}$.
+%     \begin{description}
+%     \item[$\{a, b\} = x$:] This entails $x = a \in x$.
+%     \item[$\{a, b\} = \{x, y\}$:] Suppose $b = x$ then $b = x = a$ and thus $\{b\} = \{x, y\}$, entailing $y = b$.
+%     \end{description}
+%   \end{description}
+% \end{proof}
+
+% \begin{exercise}[4.52]
+%   Prove that $\hat{\NN} = \{\emptyset, \{\emptyset\}, \{\{\emptyset\}\},
+%   \ldots\}$ exists.
+% \end{exercise}
+% \begin{proof}
+%   Apply class-level recursion to obtain the function:
+%   \[
+%     f(0) = \emptyset \qquad f(n + 1) = \{f(n)\}.
+%   \]
+%   Then $\hat{\NN} = \dom(f)$.
+% \end{proof}
+
+\printbibliography{}
+
+\end{document}

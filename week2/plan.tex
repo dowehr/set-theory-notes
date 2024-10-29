@@ -1,0 +1,424 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 2}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathcal{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Lecture 1}
+
+\emph{Material:}  ZF4--5, Cartesian products, Functions \& Relations, Natural
+numbers (Sections 4.3, Section 3.1)
+
+\emph{Book Recommendation:} How to Prove It: A Structured Approach, Daniel J. Velleman
+
+
+\subsection{Zermelo-Fraenkel: Axioms 4--5}
+
+\emph{Reading:} Section 4.4
+
+\begin{definition}
+  We fix the following axioms:
+  \begin{description}
+  \item[ZF4:] Separation
+
+    $\forall p_1 \ldots \forall p_n \forall x \exists y \forall z.~z \in y \leftrightarrow (z \in x \wedge
+    A(z, \ol{p}))$ where $A(-)$ is any formula with at most $n + 1$ free variables
+
+    For any set $x$ and parameters $\ol{p}$, the set $\{z \in x \mid A(z, p)\}$ exists
+
+  \item[ZF5:] Power set
+
+    $\forall x \exists y \forall z.~z \in y \leftrightarrow z \subseteq x$
+
+    The power set $\pow(x)$ of $x$ exists
+  \end{description}
+\end{definition}
+
+\begin{proposition}[Intersection, Difference]
+  If $x, y$ are sets then so are $x \cap y$ and $x \setminus y$.
+\end{proposition}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$x \cap y$:] Observe that $x \cap y = \{z \in x \mid z \in y\}$.
+    Formally, this uses the parameter $y$.
+  \item[$x \setminus y$:] Observe that $x \setminus y = \{z \in x \mid z \not\in
+    y\}$.
+  \end{description}
+\end{proof}
+
+\begin{proposition}[Cartesian Products]
+  For sets $A, B$, $A \times B = \{\langle a, b \rangle \mid a \in A, b \in B\}$
+  is a set.
+\end{proposition}
+\begin{proof}
+  Observe that for $a \in A, b \in B$
+  \[
+    \langle a, b \rangle = \{\{a\}, \{a, b\}\} \in \pow(\pow(A \cup B))
+  \]
+  thus set $A \times B := \{p \in \pow(\pow(A \cup B))\mid \exists a
+  \exists b.~p = \langle a, b \rangle\}$.
+\end{proof}
+
+\begin{definition}
+  A relation between sets $A$ and $B$ is an $R \subseteq A \times B$. For any
+  relation $R \subseteq A \times B$, we define its \emph{domain} as $\dom(R)
+  \coloneq \{a \in A \mid \exists b \in B.~\langle a, b \rangle \in R\}$ and
+  conversely its \emph{range} as $\ran(R) \coloneq \{b \in B \mid \exists a \in
+  A.~ \langle a, b \rangle \in R\}$.
+
+  A relation $R \subseteq A \times B$ is:
+  \begin{itemize}
+  \item \emph{total:} if for every $a \in A$ there is $b \in B$ s.t.\ $\langle
+    a, b \rangle \in R$
+  \item \emph{functional:} if for every $\langle a, b \rangle, \langle c, d
+    \rangle \in R$ if $a = c$ then $b = d$
+  \item \emph{injective:} if for every $\langle a, b \rangle, \langle c, d
+    \rangle \in R$ if $b = d$ then $a = c$
+  \item \emph{surjective:} if for every $b \in B$ there is $a \in A$ s.t.\
+    $\langle a, b \rangle \in R$
+  \end{itemize}
+  We call a total functional relation a \emph{function}. We define $B^A \coloneq
+  \{f \subseteq A \times B \mid f \text{ a function}\}$ and write $f : A \to B$
+  to mean $f \in B^A$. For $f : A \to B$ and $a \in A$ we write $f(a)$ to mean
+  the unique $b \in B$ s.t.\ $\langle a, b \rangle \in f$.
+  We call $f : A \to B$ a \emph{bijection} if it is injective and surjective.
+\end{definition}
+
+\begin{proposition}
+  For $f, g : A \to B$ we have $f = g$ iff for all $a \in A$, $f(a) = g(a)$.
+\end{proposition}
+\begin{proof}
+  Only backwards is tricky. Let $\langle a, f(a) \rangle \in f$ then, as $f(a) =
+  g(a)$, we have $\langle a, f(a) \rangle \in g$.
+\end{proof}
+
+
+\subsection{Natural numbers}
+
+\begin{definition}[Natural numbers]
+  Fix a set $N$. We call it a natural number set if it comes equipped with:
+  \begin{itemize}
+  \item an element $0 \in N$
+  \item a function $s : N \to N$
+  \end{itemize}
+  with the following properties
+  \begin{itemize}
+  \item $s : N \to N$ is injective
+  \item non-looping: for every $x \in N$, $s(x) \neq 0$
+  \item inductive: for every set $P \subseteq N$ with $0 \in P$ and for every $p \in P$,
+    $s(p) \in P$ we have $P = N$.
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}
+  Let $N$ be a natural number set. Then $s(x) \neq x$ for every $x \in N$.
+\end{proposition}
+\begin{proof}
+  We use inductivity to show $P := \{n \in N \mid s(n) \neq n\} = N$. We know
+  that $0 \in P$ per assumption about $N$. Suppose that $n \in P$, i.e.\ $s(n) \neq n$, and
+  assume $s(s(n)) = s(n)$. By injectivity this would mean $s(n) = n$, a
+  contradiction, hence $s(n) \in P$.
+\end{proof}
+
+\begin{observation}
+  With the axioms so far, we cannot prove that infinite sets exist. However, any
+  natural number set must be infinite. Hence, we cannot yet prove that such a
+  set exists.
+\end{observation}
+
+\newpage
+\section{Lecture 2}
+
+\emph{Material}: Natural numbers, Axiom of Infinity, Recursion (Sections 3.1 - 3.2, 3.4, Section 4.5)
+
+
+\subsection{Natural numbers, cont'd}
+
+\begin{remark}[Constructing $\NN$]
+  A natural choice is to take $0 := \emptyset$. There are various ways to define $s(n)$:
+  \begin{itemize}
+  \item $s(n) = \{n\} \leadsto \emptyset, \{\emptyset\}, \{\{\emptyset\}\},
+    \ldots$ (count set-levels)
+  \item $s(n) = \langle \emptyset, n \rangle \leadsto \emptyset, \langle
+    \emptyset \rangle, \langle \emptyset, \emptyset \rangle, \ldots$ (count
+    tuple size)
+  \item $s(n) = n \cup \{n\} \leadsto \emptyset, \{\emptyset\}, \{\emptyset,
+    \{\emptyset\}\}, \ldots$ (count elements)
+  \end{itemize}
+  We shall pick the last option, but every variant would work.
+\end{remark}
+
+\begin{definition}
+  A set $X$ is called \emph{inductive} if $\emptyset \in X$ and whenever $x \in
+  X$ then $x \cup \{x\} \in X$.
+
+  We fix the following additional axiom:
+  \begin{description}
+  \item[ZF7:] Infinity
+
+    $\exists x.~\emptyset \in x \wedge \forall y \in x.~y \cup \{y\} \in x$
+
+    There exists an inductive set.
+  \end{description}
+\end{definition}
+
+\begin{remark}
+  The set given by ZF7 need not be $\NN = \{\emptyset, \{\emptyset\}, \ldots\}$.
+  For example, consider the set
+  \[
+    \NN \cup \{\{\{\emptyset\}\}, \{\{\emptyset\}, \{\{\{\emptyset\}\}\}\}, \ldots\}
+  \]
+\end{remark}
+
+\begin{definition}
+  Let $I$ be the inductive set given by ZF7. Then we define
+  \[\NN \coloneq \bigcap \{J \subseteq I \mid J \text{ is inductive}\}.\]
+\end{definition}
+
+\begin{observation}
+  By construction, every $n \in \NN$ is such that its members are its
+  predecessors $n = \{0, \ldots, n-1\}$. In other words, $m < n$ iff $m \in n$.
+\end{observation}
+
+\begin{definition}
+  We write $m < n$ to mean $m \in n$. Relatedly, $m \leq n$ is $m \in n$ or $m =
+  n$.
+\end{definition}
+
+\begin{proposition}
+  The relation $< \subseteq \NN \times \NN$ is a linear order:
+  \begin{itemize}
+  \item transitive: $m < n$ and $n < l$ entails $m < l$
+  \item irreflexive: $n \not< n$
+  \item linear: $m < n$ or $m = n$ or $n < m$
+  \end{itemize}
+\end{proposition}
+\begin{proof}
+  \
+  \begin{itemize}
+  \item transitive: Fix $m$ and $n$ and prove that
+    \[
+      P := \{l \in \NN \mid n < l \to m < l\} = \NN
+    \]
+    by induction. For $0$ this is trivial as $n < 0$ is impossible. For the
+    successor case, let $n \in l \cup \{l\}$: If $n \in l$, then $m \in l$ per
+    IH and thus $m \in l \cup \{l\}$. If $n = l$ then $m \in n = l \subseteq l
+    \cup \{l\}$.
+  \item irreflexive: Again, proof per induction. For $0$ this is trivial. Now
+    suppose $n \cup \{n\} \in n \cup \{n\}$.
+    \begin{description}
+    \item[$s(n) \in n$:] Then we have $n \in s(n) \in n$ and thus $n \in n$, a
+      contradiction by IH.
+    \item[$s(n) = n$:] We have disproved this earlier.
+    \end{description}
+  \item linearity: Exercise for you!
+  \end{itemize}
+\end{proof}
+
+% \begin{lemma}
+%   If $m < n$ then $s(m) < s(n)$.
+% \end{lemma}
+% \begin{proof}
+%   Proof per induction that
+%   \[
+%     \{n \mid \forall m.~m < n \to s(m) < s(n) \} = \NN
+%   \]
+%   on $n$. Trivial in the $0$ case. Let $m < s(n)$ then:
+%   \begin{description}
+%   \item[$m < n$:] Then $s(m) < s(n) < s(s(n))$.
+%   \item[$m = n$:] Then $s(m) = s(n) < s(s(n))$.
+%   \end{description}
+% \end{proof}
+
+\begin{proposition}
+  The set $\NN$ is a natural number set.
+\end{proposition}
+\begin{proof}
+  Choose $0 \coloneq \emptyset$ and observe that $\emptyset \in \NN$ because
+  $\emptyset$ is in every inductive set. For $s : \NN \to \NN$ choose $s(n) := n
+  \cup \{n\}$ and for well-definedness let $n \in \NN$ and thus $n \in J$ for
+  every inductive set. Then, as such $J$s are inductive, $n \cup \{n\} \in J$ as
+  well and thus $s(n) \in \NN$.
+
+  Inductive: Let $P \subseteq N$ be such that $\emptyset \in P$ and for $p \in
+  P$, $s(p) \in P$ as well. Then $P$ is inductive and hence $N \subseteq P$.
+
+  Non-looping: Observe that for any $n$, $n \cup \{n\} \neq \emptyset$ because
+  $n \in n \cup \{n\}$.
+
+  Injection: Left as an exercise/read the book!
+\end{proof}
+
+\subsection{Finite and countable sets}
+
+\begin{definition}
+  A set $X$ is \emph{finite} if there is $n \in \NN$ and a bijection $f : n \to
+  X$.
+
+  A set $X$ is \emph{countable} if there is a surjection $f : \NN \to X$.
+\end{definition}
+
+\begin{proposition}
+  Non-empty finite sets are countable.
+\end{proposition}
+\begin{proof}
+  Suppose $x \in X$ and $f : n \to X$ was a bijection. Then
+  \[
+    g(m) :=
+    \begin{cases}
+      f(m) & ~m < n \\
+      x & \text{ otherwise}
+    \end{cases}
+  \]
+  is a surjection as desired.
+\end{proof}
+
+% \newpage
+
+% \section{Exercises}
+
+% \begin{exercise}[4.22]
+%   Prove $\bigcap x$ is a set.
+% \end{exercise}
+% \begin{solution}
+%   Observe that $\bigcap x = \{y \in \bigcup x \mid \forall z \in x.~y \in x\}$.
+% \end{solution}
+
+% \begin{exercise}[4.34]
+%   Let $M$ be non-empty. Why is $\{A \times \{A\} \mid A \subseteq M, A \neq
+%   \emptyset\}$ a set?
+% \end{exercise}
+
+% \begin{exercise}[4.36]
+%   Why is the existence of the following sets paradoxical?
+%   \begin{enumerate}[(a)]
+%   \item $\{x \mid x \text{ a singleton}\}$
+%   \item $\{x \mid x \text{ an ordered pair}\}$
+%   \end{enumerate}
+% \end{exercise}
+
+% % Reference: https://randall-holmes.github.io/Drafts/parameterfree.pdf
+% \begin{exercise}
+%    In the lecture we presented ZF4, the axiom of separation, using parameters
+%   \(p_1, \ldots, p_n\), i.e. \(\forall p_1, \ldots, p_n \forall x \exists y
+%   \forall z.~z \in y \leftrightarrow (z \in x \wedge A(z, p_1, \ldots, p_n)) \)
+%   where \(A\) is a formula whose only free variables are \(z\) and \(p_1, \ldots,
+%   p_n\). However, the axiom can, equivalently, be stated without parameters, that
+%   is ZF4*: \(\forall x \exists y \forall z.~z \in y \leftrightarrow (z \in x
+%   \wedge A(z)) \) where \(A\) is a formula whose only free variable is \(z\).
+
+% In this exercise you show that ZF4* entails ZF4 under ZF1-3 and ZF5-6:
+% \begin{enumerate}
+% \item
+%   Use ZF1-3, ZF5-6 as well as ZF4* to prove the existence of the following set
+%   for arbitrary $A$ and $B$:
+%   \[
+%     A \otimes B := \{[a, b] \mid a \in A, b \in B\}
+%   \]
+%   where $[a, b] = \langle \langle \{a\}, 1 \rangle, \langle \{b\}, 0
+%     \rangle \rangle$.
+%   Further, prove that it satisfies the ordered pair property: If $[a, b] = [a', b']$ then $a = a'$ and $b = b'$.
+% \item
+% Prove ZF4 using the above collection of axioms. Hint: To separate on a set \(X\) with parameters \(p_1, \ldots, p_n\), begin by applying ZF4* to \(X \otimes \{p_1\} \otimes \ldots \{p_n\}\).
+% \end{enumerate}
+% \end{exercise}
+% \begin{solution}
+%   \
+%   \begin{enumerate}
+%   \item Fix $A$ and define $A' := \{\{a\} \mid a \in A\} = \{X \in \pow(A) \mid
+%     X \text{ a singleton}\}$ which exists by separation. Then let
+%     \[
+%       A_n := \{p \in \pow(\pow(A' \cup \{n\})) \mid \exists a.~p = \langle
+%       \{a\}, n \rangle\}.
+%     \]
+%     Finally, fix
+%     \[
+%       A \otimes B := \{p \in \pow(\pow(A_1 \cup B_2)) \mid \exists a b.~p =
+%       \langle \langle \{a\}, 1 \rangle, \langle \{b\}, 0 \rangle \rangle\}.
+%     \]
+%     and write $[a, b] := \langle \langle \{a\}, 1 \rangle, \langle \{b\}, 0
+%     \rangle \rangle$.
+%   \item Fix $A(-)$, the parameters $p_1, \ldots, p_n$ and the target of
+%     separation $X$. First obtain
+%     \[
+%       Z = \{x \in X \otimes \{p_1\} \otimes \ldots \otimes \{p_n\} \mid \forall z
+%       \forall q_1, \ldots, q_n.~x = [z, q_1, \ldots, q_n ] \wedge
+%       A(z, q_1, \ldots, q_n)\}
+%     \]
+%     by parameter-free separation on \(X \times \{p_1\} \times \ldots \times
+%     \{p_n\}\). Then obtain the desired $Y$ via
+%     \[
+%        Y = \{y \in X \mid \exists q_1, \ldots, q_n.~[ y, q_1, \ldots, q_n
+%        ] \in Z\}.
+%     \]
+%   \end{enumerate}
+% \end{solution}
+
+% \begin{exercise}[3.8]
+%   Let $n \neq \emptyset$, show that $0 \in n$.
+% \end{exercise}
+
+% \begin{exercise}[3.11]
+%   Show that $m < n$ iff $m \subset n$.
+% \end{exercise}
+
+% \begin{exercise}[3.13]
+%   Show if $n \in \NN$ and $x \in n$ then $x \in \NN$.
+% \end{exercise}
+
+\printbibliography{}
+
+\end{document}

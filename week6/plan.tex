@@ -1,0 +1,446 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 6}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\begin{remark}
+  How do we count finite sets? Let $\{a, b, c, d\}$ be disjoint.
+  \begin{itemize}
+  \item $\{a, b\}$ has two elements. (Mark them)
+  \item $\{a, b, c\}$ has three elements.
+  \item $\{a, b, a\}$ has two elements
+  \end{itemize}
+\end{remark}
+
+\begin{definition}
+  A set $X$ is \emph{finite} if there is a bijection $f : n \to X$. A non-finite
+  set is infinite.
+\end{definition}
+
+\emph{Question:} Can we also assign size to infinite sets? Spoiler: Not without
+the AC, but we shall lay the groundwork.
+
+\begin{definition}
+  Let $A, B$ be sets.
+  \begin{itemize}
+  \item $A$ and $B$ are \emph{equinumerous} if there is a bijection $f : A \to
+    B$. We write $A \simeq B$.
+  \item $A$ is \emph{less than or equinumerous} with $B$ if there is an
+    injection $f : A \to B$. We write $A \preceq B$.
+  \item $A$ is \emph{dominated} by $B$ if $A \preceq B$ but $A \not\simeq B$ We
+    write $A \prec B$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}
+  Consider functions $f : A \to B, g : B \to C$ and $g \circ f := \{(a, g(f(a)))
+  \mid a \in A\}$.
+  \begin{enumerate}
+  \item If $f, g$ are injections, so is $g \circ f$.
+  \item If $f, g$ are surjections, so is $g \circ f$.
+  \item If $f, g$ are bijections, so is $g \circ f$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  $\NN \simeq \ZZ$
+\end{lemma}
+\begin{proof}
+  Consider the following bijection $b : \ZZ \to \NN$:
+  \[
+    b(z) :=
+    \begin{cases}
+      \abs{2z} & z \geq 0 \\
+      \abs{-2z - 1} & z < 0
+    \end{cases}
+  \]
+  \emph{Draw the image to illustrate.}
+\end{proof}
+
+\begin{lemma}
+  For $n \in \NN$ we have $\NN \simeq \NN \setminus \{n\}$.
+\end{lemma}
+\begin{proof}
+  For the bijection, consider
+  \[
+    b(m) :=
+    \begin{cases}
+      m & m < n \\
+      m + 1 & m \geq n.
+    \end{cases}
+  \]
+  \emph{Draw a picture again.}
+\end{proof}
+
+\begin{corollary}
+  If $A \subseteq \NN$ is finite then $\NN \simeq \NN \setminus A$.
+\end{corollary}
+
+\begin{lemma}
+  If $\NN \preceq X$ then $X$ is infinite.
+\end{lemma}
+\begin{proof}
+  Suppose there was an injection $f : \NN \to X$ and a bijection $g : X \to n$
+  for $n \in \NN$. This yields an injection $g \circ f$. We prove per induction
+  on $n$ that no such injection can exist.
+  \begin{description}
+  \item[$n = 0$:] There can be no function $h : NN \to \emptyset$.
+  \item[$n \to n + 1$:] Let $h : \NN \to n + 1$ be an injection. We know that a
+    bijection $b : \NN \setminus \{h^{-1}(n)\} \to \NN$ exists. Observe $\ran(h
+    \circ b) = (n + 1) \setminus \{n\} = n$ and that $h \circ b$ is an
+    injection. But such an injection cannot exist per IH.
+  \end{description}
+\end{proof}
+
+\begin{lemma}
+  $\simeq$ is an equivalence relation.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[reflexive:] For a set $A$ the function $1_A := \{(a, a) \mid a \in A\}$
+    is a bijection of the right type.
+  \item[symmetric:] The inverse of a bijection is a bijection.
+  \item[transitive:] Composing two bijections yields a bijection.
+  \end{description}
+\end{proof}
+
+\begin{lemma}
+  $\preceq$ is reflexive and transitive.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[reflexive:] $1_A$ is an injection.
+  \item[transitive:] Composing injections yields an injection.
+  \end{description}
+\end{proof}
+
+\begin{theorem}[Cantor-Schröder-Bernstein]
+  $\preceq$ is anti-symmetric. I.e.\ if $A \preceq B$ and $B \preceq A$ then $A \simeq B$.
+\end{theorem}
+\begin{proof}
+  \emph{Na\"ive Idea:} Start with the surjection $h^* : A \to B$
+  \[
+    h^*(a) :=
+    \begin{cases}
+      g^{-1}(a) & \text{ if this is defined} \\
+      f(a) & \text{otherwise}
+    \end{cases}.
+  \]
+  When can this violate injectivity? Whenever we have $g(f(a)) \neq a$ as both
+  will map to $a$ \emph{(draw the triangle!)}. How to fix this? Redirect
+  $g(f(a)) \mapsto f(g(f(a)))$. But this can cause further problems!
+
+  Define
+  \[
+    A_0 := A \setminus \ran(g) \quad B_i := f(A_i) \quad A_{n + 1} := \{g(b)
+    \mid b \in B_n\}
+  \]
+  \emph{Intuitively:} $a \in A_n$ for $n > 0$ if there is a problem with taking
+  $a \mapsto g^{-1}(a)$ collision after $n$ redirection steps.
+
+  Define $h : A \to B$
+  \[
+    h(a) :=
+    \begin{cases}
+      f(a) & \exists n.~a \in A_n \\
+      g^{-1}(a) & \text{ otherwise}
+    \end{cases}
+  \]
+  and observe that if $a \not\in A_0$ then $a \in \ran(g)$ so this is well-defined.
+
+  \begin{description}
+  \item[injectivity:] Let $h(a) = h(a')$. We distinguish which case of the
+    definition applies.
+    \begin{description}
+    \item[$h(a) = f(a)$ and $h(a') = f(a')$:] Then $a = a'$ by injectivity of $f$.
+    \item[$h(a) = g^{-1}(a)$ and $h(a') = g^{-1}(a')$:] Then $a = g(g^{-1}(a)) =
+      g(g^{-1}(a')) = a'$.
+    \item[$h(a) = f(a)$ and $h(a') = g^{-1}(a')$:] Then $a \in A_n$, $f(a) \in
+      B_n$ and $g(f(a)) = a' \in B_{n+1}$, contradicting the defining condition
+      for $h(a')$.
+    \end{description}
+  \item[surjectivity:] Let $b \in B$.
+    \begin{description}
+    \item[$b \in B_n$:] If $b \in B_n$ then there is an $a \in B_n$ with $h(a) = f(a) = b$.
+    \item[$b \not\in B_n$ for all $n$:] Then $g(b) \not\in A_n$ for all $n \in
+      \NN$: It cannot be in $A_0$. If $g(b) \in A_{n + 1}$ then $b \in B_n$,
+      which we have ruled out.
+
+      That means $h(g(b)) = g^{-1}(g(b)) = b$.
+    \end{description}
+  \end{description}
+\end{proof}
+
+\begin{lemma}
+  $\prec$ is irreflexive and transitive.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[irreflexive:] For any set $A$, $A \simeq A$ via $1_A : A \to A$.
+  \item[transitive:] Let $A \preceq B \preceq C$ with $A \not\simeq B \not\simeq
+    C$. We showed before that $A \preceq C$. Suppose, towards contradiction,
+    that $A \simeq C$. Then $B \preceq C \simeq A$ yields $B \preceq A$ (compose
+    the underlying functions!). But by Cantor-Schröder-Bernstein, $A \preceq B$
+    and $B \preceq A$ implies $A \simeq B$, contradicting our assumption.
+  \end{description}
+\end{proof}
+
+\begin{corollary}
+  If $A \preceq B \prec C$ or $A \prec B \preceq C$ we have $A \prec C$.
+\end{corollary}
+
+
+\begin{remark}
+  We have shown that under ZL, $\preceq$ is a total relation.
+\end{remark}
+
+
+\newpage
+
+\section{Lecture 2}
+
+\subsection*{Countability}
+
+\begin{definition}
+  $A$ is \emph{countable} if it is finite or $A \simeq \NN$. We say that $A$ is
+  countably infinite if $A \simeq \NN$. If a set is not countable, it is said to
+  be \emph{uncountable}.
+\end{definition}
+
+\begin{theorem}
+  If $A \subseteq N$ then either $A$ is finite or $A \simeq \NN$.
+\end{theorem}
+\begin{proofsketch}
+  Observe that either $A \subseteq n \in \NN$ or for every $n \in A$ there is an
+  $m \in A$ with $n < m$.
+  \begin{description}
+  \item[$A \subseteq n$:] We can prove per induction on $n$ that there exists an
+    $m \leq n$ with $m \simeq n$.
+  \item[Otherwise:] Consider $c : \Pi n \in A.~\{m \in A \mid n <
+    m\}$ defined via
+    \(
+      c(n) := \min \{m \in A \mid n < m\}
+      \). Then the following is an injection witnessing $\NN \preceq A$:
+      \[
+        i(0) := \min A \qquad \qquad f(n + 1) := c(f(n)).
+      \]
+  \end{description}
+\end{proofsketch}
+
+\begin{lemma}
+  $\NN \times \NN \simeq \NN$
+\end{lemma}
+\begin{proof}
+  Recall that $1 + \ldots + n = \frac{n(n + 1)}{2}$. Then consider the bijection
+  $b : \NN \to \NN \times \NN$ with:
+  \[b(n, m) := \frac{k(k + 1)}{2} + n \text{ where } k = n + m\]
+  \emph{Draw the picture.}
+\end{proof}
+\begin{remark}
+  The general statement that $A \simeq A \times A$ for infinite $A$ is
+  equivalent to AC.
+\end{remark}
+
+\begin{corollary}
+  $\NN \simeq \QQ$
+\end{corollary}
+\begin{proof}
+   We use Cantor-Schröder-Bernstein. Clearly $\NN \preceq \QQ$. Recall also the bijection $b
+   : \ZZ \to \NN$. Then we can define the $\preceq$-part of $\QQ \preceq \NN
+   \times \NN \simeq \NN$ as follows:
+   \[
+     i(\cls{(a, b)}) := (b(z), b(z')) \text{ for } (z, z') \in \cls{(a, b)}
+     \text{ with least } z'
+   \]
+\end{proof}
+
+\begin{theorem}
+  $\NN \simeq \ZZ \simeq \QQ$
+\end{theorem}
+
+\begin{lemma}
+  Let $V$ be a countably infinite set of propositional variables and consider the set $\FF$
+  of formulas generated by
+  \[
+    \varphi, \psi \in \FF ::= x \mid \neg \varphi \mid \varphi \wedge \psi \mid
+    \varphi \vee \psi \qquad x \in V
+  \]
+  Then $\FF$ is countably infinite.
+\end{lemma}
+\begin{proof}
+  We use CSB. Let $x \in V$. Then we obtain $\NN \preceq \FF$ via
+  \[
+    i(0) := x \qquad i(n + 1) := x \wedge i(n)
+  \]
+  Conversely, let $b : \NN \times \NN \to \NN$ and $v : V \to \NN$ be bijections. Then we obtain
+  $\FF \preceq \NN$ via
+  \begin{mathpar}
+    j(x) := b(0, v(x))
+
+    j(\neg \varphi) := b(1, j(\varphi))
+
+    j(\varphi \wedge \psi) := b(2, b(j(\varphi), j(\psi)))
+
+    j(\varphi \vee \psi) := b(3, b(j(\varphi), j(\psi))).
+  \end{mathpar}
+\end{proof}
+
+\subsection*{Powerset and Reals}
+
+\begin{corollary}
+  $\NN \prec \RR$.
+\end{corollary}
+\begin{proof}
+  We know that $\NN \preceq \RR$. We have also proven before that there can be no surjection
+  $\NN \to \RR$ and thus that $\NN \not\simeq \RR$.
+\end{proof}
+
+\begin{lemma}
+  $\pow(X) \simeq 2^X$
+\end{lemma}
+\begin{proof}
+  Consider $\chi : \pow(X) \to 2^X$ given by
+  \[
+    \chi_A(x) :=
+    \begin{cases}
+      1 & x \in A \\
+      0 & x \not\in A
+    \end{cases}
+  \]
+\end{proof}
+
+\begin{lemma}
+  If $2 \preceq Y$ then $X \prec Y^X$.
+\end{lemma}
+\begin{proof}
+  Observe that $X \preceq \pow(X) \simeq 2^X \preceq Y^X$. Now suppose $b : X \simeq
+  Y^X$. Consider the function $f : X \to Y$ defined as follows:
+  \[
+    f(x) :=
+    \begin{cases}
+      i(1) & b(x)(x) = i(0) \\
+      i(0) & \text{otherwise}
+    \end{cases}
+  \]
+  and observe that $f(x) \neq b(x)(x)$ and thus $f \neq b(x)$ for every $x \in
+  X$ and thus $f \not\in \ran(b)$. Then $b$ cannot be a surjection.
+\end{proof}
+\begin{corollary}
+  $X \prec \pow{X}$
+\end{corollary}
+
+\begin{lemma}
+  $\RR \simeq \pow(\QQ) \simeq 2^\NN \simeq \NN^\NN$.
+\end{lemma}
+\begin{proof}
+  We use CSB. We already know $\RR \preceq \pow(\QQ) \simeq \pow(\NN) \simeq
+  2^\NN$. It remains to find an injection $i : 2^\NN \to \RR$. Pick
+  \[
+    i(f) := \sup \left\{\left(\sum_{i = 0}^n \frac{f(i)}{10^i}\right)_\RR \mid n \in \NN\right\}
+  \]
+  Intuitively, this means $i(f) = f(0).f(1)f(2)f(3)\ldots$ as a sequence of
+  digits.
+
+  For $2^\NN \preceq \NN^\NN$ consider the following injection $b : \NN^\NN \to
+  2^\NN$:
+  \[
+    b(f) := n \mapsto
+    \begin{cases}
+      0 & \exists k \in \NN.~n = \sum_{i = 0}^k (f(k) + 1) \\
+      1 & \text{ otherwise }
+    \end{cases}
+  \]
+  In other words,
+  \[
+    b(f) = 0 \underbrace{1 \ldots 1}_{f(0)} 0 \underbrace{1 \ldots 1}_{f(1)} 0
+    \underbrace{1 \ldots 1}_{f(2)} 0 \ldots
+  \]
+  This is only an injection as $0^\omega \not\in \ran(b)$.
+\end{proof}
+
+\begin{lemma}
+  $\RR \times \RR \simeq \RR$
+\end{lemma}
+\begin{proof}
+  We show $2^\NN \times 2^\NN \simeq 2^\NN$ instead. Then simply consider
+  \[
+    b(f, g) := n \mapsto
+    \begin{cases}
+      f(k) & n = 2k \text{ for } k \in \NN \\
+      g(k) & n = 2k + 1 \text{ for } k \in \NN
+    \end{cases}
+  \]
+  i.e. we obtain the sequence $f(0)g(0)f(1)g(1)\ldots$.
+\end{proof}
+
+\begin{remark}
+  The continuum hypothesis posits that there is no $A \subseteq \pow(\NN)$ such
+  that $\NN \prec A \prec \pow(\NN)$. It is independent of ZFC!
+
+  Contrast with the statement we proved earlier that every $A \subseteq \NN$ is countable.
+\end{remark}
+
+\printbibliography{}
+
+\end{document}

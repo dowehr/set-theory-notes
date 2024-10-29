@@ -1,0 +1,357 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 1}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathcal{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\emph{Material:} Language of ST, Na\"ive ST
+
+\subsection{Organizational matters}
+
+\paragraph{Most matters}
+
+My email: dominik.wehr@gu.se.
+
+Lectures on Tuesday \& Wednesday at 10, exercise class on Thursday at 10.
+
+Literature: \emph{Classic Set Theory} by Derek Goldrei. (Available online)
+
+\paragraph{Examination}
+
+There will be one sit down written examination. This is an individual closed
+book exam and you are not allowed to bring any text, book, computer or other
+device to the exam.
+
+There will be 3 assignment sheets are not obligatory to pass the course, but we
+strongly recommend students to take the opportunity to get feedback on written
+solutions.
+
+\subsection{Formal Language}
+\emph{Reading:} Subsection 4.2
+
+\begin{tabular}{c|c}
+  Formula & Meaning \\
+  \hline
+  $x = y$ & ``$x$ equals $y$'' \\
+  $x \in y$ & ``$x$ is element of $y$'' \\
+  $\neg A$ & ``not $A$'' \\
+  $A \wedge B$ & ``$A$ and $B$'' \\
+  $A \vee B$ & ``$A$ or $B$'' \\
+  $\forall x. A(x)$ & ``for every set $x$, $A(x)$ holds'' \\
+  $\exists x. A(x)$ & ``there exists $x$ st. $A(x)$ holds''
+\end{tabular}
+
+\begin{example}
+  \
+  \begin{itemize}
+  \item $\exists x. \forall y.~y \in x$: There is a universal set
+  \item $\forall y. y \in x \to y = a \vee y = b$: $x = \{a, b\}$
+  \item $\exists x. \forall y. \forall z. y \in x \wedge z \in x \to y = z$: At
+    most one element in $x$
+  \item $\forall a.~a \in x \leftrightarrow a \in y \vee a \in z$: $x = y \cup z$
+  \item $\forall a.~a \in x \leftrightarrow a \in y \wedge a \in z$: $x = y \cap z$
+  \item $\forall a.~a \in x \leftrightarrow a \in y \wedge a \not\in z$: $x = y \setminus z$
+  \end{itemize}
+\end{example}
+
+\subsection{Na\"ive Set Theory}
+\emph{Reading:} Subsection 4.1
+
+\begin{definition}[Na\"ive Set Theory]
+  Naive set theory is classical FOL + the following axiom scheme for every
+  formula $A$ with free variable $y$ and parameters:
+  \[
+    \text{(Comprehension)}~~\exists x. \forall y.~y \in x \leftrightarrow A(y)
+  \]
+  We write $\{y : A(y)\}$ to denote said set.
+\end{definition}
+
+\begin{example}
+  $\text{One} := \{x : x \text{ has at most one element}\}$ then $\{\text{One}\}
+  \in \text{One}$
+\end{example}
+
+\begin{example}
+  $\RR \coloneq \{x : x \not\in x\}$. Then:
+  \begin{itemize}
+  \item $\RR \not\in \RR$: Suppose $\RR \in \RR$ then $\RR \not\in \RR$ per
+    def.\ of $\RR$. Contradiction!
+  \item $\RR \in \RR$: Because $\RR \not\in \RR$.
+  \end{itemize}
+  \emph{Conclusion:} Na\"ive Set Theory is inconsistent (= we can derive a contradiction).
+\end{example}
+
+\paragraph{Plan:} Build a consistent set theory. That means:
+\begin{itemize}
+\item \emph{consistent:} The theory should not contain contradictions. Since
+  Gödel's work, we know that we cannot (convincingly) prove this. However
+  \begin{enumerate}[(a)]
+  \item we believe that ZF(C) is consistent and
+  \item nobody has yet managed to show its inconsistency.
+  \end{enumerate}
+\item \emph{set theory:} The theory will only speak about sets. Non-set objects,
+  such as numbers, functions, etc.\ will be ``simulated'' by suitable sets.
+\end{itemize}
+
+
+\newpage
+\section{Lecture 2}
+
+\emph{Material:} ZF1-3, Ordered pairs, Union axiom (Sections 4.1-4.4)
+
+
+\subsection{Zermelo-Fraenkel: Axioms 1--3}
+\emph{Reading:} Subsection 4.3
+
+\begin{definition}
+  We fix the following axioms:
+  \begin{description}
+  \item[ZF1:] Extensionality
+
+    $\forall x \forall y.~x = y \leftrightarrow \forall z.~z \in x
+    \leftrightarrow z \in y$
+
+    Two sets are precisely equal if they have the same elements.
+
+  \item[ZF2:] Empty set
+
+    $\exists x \forall y.~ y \not\in x$
+
+    The empty set exists.
+
+  \item[ZF3:] Pairing
+
+    $\forall x \forall y \exists p \forall z.~z \in p \leftrightarrow (z = x
+    \vee z = y)$
+
+    For any $x,y$, the set $\{x, y\}$ exists.
+  \end{description}
+\end{definition}
+
+\begin{proposition}[Uniqueness]
+  The set $\emptyset$ and the set $\{x, y\}$ are always unique.
+\end{proposition}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$\emptyset$:] Let $x$ and $y$ have no elements. We prove $x = y$ using
+    extensionality, i.e. $z \in x$ iff $z \in y$ for any $z$. Let $z \in x$. But
+    as $x$ is empty, we also know that $z \not\in x$, a contradiction! The
+    opposite direction follows analogously.
+  \item[$\{x, y\}$:] Let $p, q$ be pairings of $x, y$. Observe that for any $z$
+    \[
+      z \in p \leftrightarrow z = x \vee z = y \leftrightarrow z \in q
+    \]
+    and hence $p = q$ by extensionality.
+  \end{description}
+\end{proof}
+
+\begin{remark}
+  \
+  \begin{itemize}
+  \item This justifies our use of the definite article
+  \item This is a pattern that is generally true
+  \end{itemize}
+\end{remark}
+
+\begin{proposition}[Singleton]
+  For any $x$, the set $\{x\}$ exists.
+\end{proposition}
+\begin{proof}
+  Simply pair $x$ with $x$. I.e.\ we obtain a set $p$ s.t.\ $z \in p
+  \leftrightarrow z = x \vee z = x \leftrightarrow z = x$.
+\end{proof}
+
+
+\begin{remark}
+  Any `collection of sets' is a \emph{class}, i.e.\ any one-place predicate. Not
+  every class is a set, i.e. `$\{x \mid x \not\in x\}$' is a class but not a set.
+\end{remark}
+
+\subsection{Ordered pairs}
+\emph{Reading:} Subsection 4.3
+
+\emph{Problem:} We want a structure $\langle x, y \rangle$ such that $\langle x,
+y\rangle = \langle a, b \rangle$ iff $x = a$ and $y = b$.
+
+\emph{Non-solution:} $\langle x, y \rangle = \{x, y\}$. Problem: $\langle x, y
+\rangle = \langle y, x \rangle$ then.
+
+\begin{definition}[Ordered Pairs]
+  We fix $\langle x, y \rangle := \{\{x\}, \{x, y\}\}$.
+\end{definition}
+
+\begin{proposition}
+  If $x, y$ are sets then so is $\langle x, y \rangle$.
+\end{proposition}
+\begin{proof}
+  Use Pairing.
+\end{proof}
+
+\begin{theorem}[Ordered Pair Property]
+  $\langle x, y \rangle = \langle a, b \rangle$ iff $x = a$ and $y = b$
+\end{theorem}
+\begin{proof}
+  The backwards direction is just equality.
+
+  Suppose $\{\{x\}, \{x, y\}\} = \{\{a\}, \{a, b\}\}$:
+  \begin{description}
+  \item[$x = a$:] By extensionality, we know that $\{x\} = \{a\}$ or $\{x\} =
+    \{a, b\}$.
+    \begin{description}
+    \item[$\{x\} = \{a\}$:] Then $x = a$ follows by extensionality.
+    \item[$\{x\} = \{a, b\}$:] By extensionality, $a = x$.
+    \end{description}
+  \item[$y = b$:] Again, we know that $\{x, y\} = \{a\}$ or $\{x, y\} = \{a, b\}$.
+    \begin{description}
+    \item[$\{x, y\} = \{a, b\}$:] Then $y = a$ or $y = a$. If $y = b$ we are
+      done. If $y = a$ with $x = a$ from above, we may continue as in the next
+      case.
+    \item[$\{x, y\} = \{a\}$:] Then $x = a = y$. But as $\{a, b\} = \{x, y\}$ or
+      $\{a, b\} = \{x\}$, we have $\{a, b\} = \{a\}$, and thus $a = b$, in
+      either case. Hence $y = a = b$.
+    \end{description}
+  \end{description}
+\end{proof}
+
+\begin{definition}
+  We define $\langle x_1, \ldots, x_n \rangle := \langle x_1,
+  \langle \ldots \langle x_n, \emptyset \rangle \rangle \rangle$.
+\end{definition}
+
+\subsection{Union axiom}
+\emph{Reading:} Section 4.4
+
+\begin{observation}
+  We currently cannot prove that there are sets with more than 2 elements.
+\end{observation}
+\begin{corollary}
+  We cannot prove that $A \times B$ for sets $A, B$ is a set.
+\end{corollary}
+\begin{proof}
+  Let $A = \{\emptyset, \{\emptyset\}\}$ then $\abs{A \times A} = 4$.
+\end{proof}
+
+\begin{definition}
+  We fix the following axiom:
+  \begin{description}
+  \item[ZF6:] Union
+
+    $\forall x \exists y \forall z.~z \in y \leftrightarrow \exists w.~z \in
+    w \wedge w \in x$
+
+    The set $\bigcup x$ exists
+  \end{description}
+\end{definition}
+
+\begin{proposition}[Union]
+  If $x, y$ are sets then so is $x \cup y$.
+\end{proposition}
+\begin{proof}
+   Observe that $x \cup y = \bigcup \{x, y\}$.
+\end{proof}
+
+\begin{proposition}[List sets]
+  For $\{x_1, \ldots, x_n\}$ is a set for sets $x_1, \ldots, x_n$.
+\end{proposition}
+\begin{proof}
+  Induction on $n$.
+  \begin{description}
+  \item[$n = 0$:] The empty set exists.
+  \item[$n = m + 1:$] Then $I = \{x_1, \ldots, x_m\}$ is a set per IH. Then $\{x_1,
+    \ldots, x_m, x_{m + 1}\} = I \cup \{x_{m + 1}\}$ (this requires another induction).
+  \end{description}
+\end{proof}
+
+\begin{remark}
+  For $A = \{\emptyset, \{\emptyset\}\}$ we can now define $A \times A$:
+  \[
+    A \times A := \{\langle \emptyset, \emptyset \rangle, \langle \emptyset,
+    \{\emptyset\} \rangle, \langle \{\emptyset\}, \emptyset \rangle, \langle
+    \{\emptyset\}, \{\emptyset\} \rangle\}
+  \]
+\end{remark}
+
+% \newpage
+% \section{Exercises}
+
+% 4.3: 4.12, 4.14
+
+% \begin{exercise}[4.12]
+%   Let $x, y, z$ be sets.
+%   \begin{enumerate}[(a)]
+%   \item Show that $\langle x, y, z \rangle$ is unique.
+%   \item Show that for $u, v, w$ with $\langle x, y, z \rangle = \langle u, v, w
+%     \rangle$, $u = x$, $v = y$ and $w = z$.
+%   \item Alternatively, we can take $\langle x, y, z \rangle := \langle \langle
+%     x, y \rangle, z \rangle$. Does this work? Are ordered triples represented
+%     the same way?
+%   \end{enumerate}
+% \end{exercise}
+
+% \begin{exercise}[4.14]
+%   Which of the following definitions of $\langle x, y, z \rangle$ work?
+%   \begin{enumerate}[(a)]
+%   \item $\{\{x\}, \{x, y\}, \{x, y, z\}\}$
+%   \item $\langle \{x, y\}, {y, z} \rangle$
+%   \item $\{\langle x, y \rangle, \langle y, z \rangle, \langle z, x \rangle\}$
+%   \item $\{\langle x, y \rangle, \langle x, z \rangle, \langle y, z \rangle\}$
+%   \item $\{\langle x, y \rangle, \langle y, z \rangle\}$
+%   \item $\{\langle x, \langle x, y \rangle, \langle \langle y, z \rangle, z \rangle \rangle\}$
+%   \end{enumerate}
+% \end{exercise}
+
+\printbibliography{}
+\end{document}

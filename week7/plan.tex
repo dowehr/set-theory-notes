@@ -1,0 +1,464 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 7}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\OO}{\mathbb{O}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+\newcommand{\IS}{\text{IS}}
+\newcommand{\ord}{\text{Ord}}
+\newcommand{\Exp}{\text{Exp}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\emph{Warning:} This week will go very fast. We have covered only 160 pages
+of the book so far and this week will cover nearly 70 pages. We will
+have to skip some proofs.
+
+\subsection{Well-orders}
+
+\begin{definition}
+  Let $<\, \subseteq X \times X$ be a linear order:
+  \begin{description}
+  \item[irreflexive:] We never have $x < x$ for $x \in X$
+  \item[transitive:] If $x < y$ and $y < z$ then $x < z$
+  \item[linear:] Either $x < y$ or $x = y$ or $x > y$
+  \end{description}
+
+  \begin{enumerate}
+  \item Let $x \in X$ then the \emph{initial segment of $x$} is $\IS_<(x) := \{y
+    \in X \mid y < x \}$.
+  \item Then $(X, <)$ is a well-order if it exhibits the \emph{well-ordering
+      property}: For every $\emptyset \neq A \subseteq X$ there is an element $a
+    \in A$ with $a \leq A$.
+  \item Then $(X, <)$ exhibits $<$-induction if for every set $P \subseteq X$ such that
+    \[
+      \text{for every } x \in X \text{ if } \IS_<(x) \subseteq P \text{ then } x
+      \in P
+    \]
+    we have that $P = X$.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}
+  Let $<\, \subseteq X \times X$ be linear. Then it is a well-order iff it
+  exhibits $<$-induction.
+\end{theorem}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$\to$:] Let $<$ be a well-order and let $P \subseteq X$ be such that for
+    every $x \in X$ if $\IS(x) \subseteq P$ then $x \in P$. Suppose $P \neq X$,
+    i.e. suppose there was $X \setminus P \neq \emptyset$. By the well-ordering
+    property of $<$ there is a least $x \in X \setminus P$, meaning $\IS_<(x)
+    \subseteq P$. But then $x \in P$ as well, leading to a contradiction.
+  \item[$\leftarrow$:] We prove the following per $<$-induction:
+    \[
+      P := \{x \in X \mid \forall \emptyset \neq A \subseteq X.~x \in A \to \min(A) \text{
+        exists}\} = X
+    \]
+    First, suppose $P = X$ and consider $\emptyset \neq A \subseteq X$. Because
+    $\emptyset \neq A$ there is some $x \in A$. Because $x \in P$ we thus obtain
+    $\min(A)$ as desired.
+
+    To prove $P = X$ by $<$-induction, let $x \in X$ be such that $\IS_<(x)
+    \subseteq P$ and consider $x \in A \subseteq X$. There are two cases to
+    distinguish:
+    \begin{description}
+    \item[$\exists a \in A.~a < x$:] Then, because $a \in P$, we obtain that
+      $\min(A)$ exists.
+    \item[$x = \min(A)$:] Then we are done.
+    \end{description}
+  \end{description}
+\end{proof}
+
+\begin{theorem}
+  Let $(X, <)$ be a well-order. Then exhibits $<$-recursion: For every three place formula $A$ such that
+    \[
+      \forall x \in X, y.~\exists z.~A(x, y, z) \wedge \forall z'.~A(x, y, z')
+      \to z = z'
+    \]
+    there exists a function $f$ with $\dom(f) = X$ and such that for all $x \in
+    X$ we have $A(x, f \uh x, f(x))$ where $f \uh x \coloneq \{(y, z) \in f \mid
+    y < x\}$.
+\end{theorem}
+\begin{proofsketch}
+  We proceed as usual for recursion theorems. For $x \in X$ an $x$-germ is a function
+  $g$ with $\dom(g) = \IS_<(x) \cup \{x\}$ such that for all $y \in
+  \dom(g)$ we have $A(y, g \uh y, g(x))$. We prove, per $<$-induction, the following
+  two properties:
+  \begin{itemize}
+  \item For every $x \in X$ there exists an $x$-germ
+  \item If $x, y \in X$ and $g, g'$ are an $x$- and $y$-germ, respectively, then
+    $g \uh \min(x, y) = g' \uh \min(x, y)$
+  \end{itemize}
+  Then we obtain the following set via replacement
+  \[
+    G := \{g \mid g \text{ is an } x\text{-germ for } x \in X\}
+  \]
+  and observe that $f := \bigcup G$ is as desired.
+\end{proofsketch}
+
+\subsection{Introducing Ordinals}
+
+\begin{remark}
+  Recall: $n^+ := n \cup \{n\}$. What about $\NN^+ = \NN \cup \{\NN\}$?
+  It is still a well-order wrt $\in$! Define
+  \[
+    \omega + 0 := \NN \qquad \omega + (n + 1) := (\omega + n)^+
+  \]
+  Then $\omega + \omega = \NN \cup \{\omega + n \mid n \in \NN\}$ is still a
+  well-order! We shall study well-orders that are like it.
+\end{remark}
+
+\begin{definition}
+  And ordinal $\alpha$ is a set such that:
+  \begin{itemize}
+  \item $(\alpha, \in)$ is a well-order and
+  \item $\alpha$ is \emph{transitive:} If $\beta \in \alpha$ then $\beta
+    \subseteq \alpha$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}
+  Let $\alpha$ be an ordinal and $\beta \in \alpha$. Then
+  \begin{enumerate}[(i)]
+  \item $\beta = \IS_\in(\beta)$ and
+  \item $\beta$ is an ordinal.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  \
+  \begin{enumerate}[(i)]
+  \item Observe that $\IS_\in(\beta) = \{\gamma \in \alpha \mid \gamma \in
+    \beta\} \stackrel{\beta \subseteq \alpha}{=} \beta$.
+  \item We know that $\beta$ is a $\in$-well-order because $\beta \subseteq \alpha$.
+    For transitivity, let $\gamma \in \beta$ and observe that by transitivity of
+    $\in$ we have $\delta \in \beta$ for any $\delta \in \gamma \in \beta$.
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}
+  Let $\alpha$ be an ordinal then so is $\alpha^+ := \alpha \cup \{\alpha\}$.
+\end{lemma}
+\begin{proof}
+  We prove that $\alpha^+$ is transitive. Let $\beta \in \alpha^+$ then either
+  $\beta \in \alpha$ and thus $\beta \subseteq \alpha \subseteq \alpha^+$ or
+  $\beta = \alpha \subseteq \alpha^+$.
+\end{proof}
+
+\begin{lemma}
+  Let $A$ be a set of ordinals. Then $\bigcup A$ is an ordinal.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[Transitive:] Let $\beta \in \bigcup A$ then $\beta \in \alpha \in A$ and
+    thus $\beta \subseteq \alpha \subseteq A$.
+\item[$\in$-well-order:] As usual, the union of linear orders is a linear order.
+  For the well-ordering property, let $B \subseteq \bigcup A$ such that $\beta \in B$.
+  Consider $B' := \{\alpha \in B \mid \alpha \in \beta\} \cup \{\beta\}$;
+  because $\beta \in \gamma \in A$ there is $\min(B')$. By linearity, suppose
+  there was $\delta \in B$ with $\delta \in \min(B')$ then $\delta \in B'$,
+  contradicting the minimality of $\min(B')$.
+  \end{description}
+\end{proof}
+
+\begin{corollary}
+  Let $A$ be a set of ordinals. Then $A$ is an ordinal iff $A$ is transitive.
+\end{corollary}
+\begin{proof}
+  Observe that if $A$ is a set of ordinals, then $A \subseteq \bigcup \{\alpha^+ \mid
+  \alpha \in A\}$ because for any $\alpha \in A$ we have $\alpha \in \alpha^+
+  \in \{\alpha^+ \mid \alpha \in A\}$.
+\end{proof}
+
+\begin{corollary}
+  Let $\alpha, \beta$ be ordinals. Then $\alpha \in \beta$ or $\alpha = \beta$
+  or $\beta \in \alpha$.
+\end{corollary}
+\begin{proof}
+  Observe that $\alpha, \beta \in \alpha^+ \cup \beta^+$, the latter being an
+  ordinal. The claim then follows from the linearity of $\alpha^+ \cup \beta^+$.
+\end{proof}
+
+\begin{corollary}
+  There is no set $\OO$ of all ordinals.
+\end{corollary}
+\begin{proof}
+  $\OO$ would be an ordinal, because it is transitive: Let $\alpha \in \OO$ then
+  every $\beta \in \alpha$ is an ordinal and hence $\alpha \subseteq \OO$. But
+  then $\OO \in \OO$, contradicting foundation.
+\end{proof}
+
+\subsection{Successors and limits}
+
+\begin{definition}
+  Let $\alpha$ be an ordinal. It is
+  \begin{itemize}
+  \item a \emph{successor} if there exists an ordinal $\beta \in \alpha$ such that $\alpha
+    = \beta^+$.
+  \item a \emph{limit} if for every ordinal $\beta \in \alpha$ we have $\beta^+
+    \in \alpha$.
+  \end{itemize}
+\end{definition}
+
+\begin{example}
+  \
+  \begin{enumerate}
+  \item $0 \neq n \in \omega$ and $\omega + n$ for $n > 0$ are successors.
+  \item $\omega$ and $\omega + \omega$ are limits.
+  \end{enumerate}
+\end{example}
+
+\begin{theorem}
+  Let $\alpha$ be an ordinal. Then it is a successor or a limit.
+\end{theorem}
+\begin{proof}
+  We perform a case-distinction:
+  \begin{description}
+  \item[$\exists \beta \in \alpha.~\alpha = \beta^+$:] Then $\alpha$ is a successor.
+  \item[$\forall \beta \in \alpha.~\alpha \neq \beta^+$:] Let $\beta \in \alpha$
+    and suppose that $\alpha \in \beta^+$ (by linearity). That means that
+    $\alpha \in \beta$ or $\alpha = \beta$. In either case, this violates foundation.
+  \end{description}
+\end{proof}
+
+\begin{remark}
+  It is somewhat controversial whether $0$ should be a limit or not. The book
+  says it is not.
+\end{remark}
+
+
+\newpage
+
+\section{Lecture 2}
+
+\subsection{Ordinals are Ordinal Numbers}
+
+\begin{definition}
+  Let $(X, <_X)$ and $(Y, <_Y)$ be linear orders on $X, Y$, respectively. We call $f : X
+  \to Y$ \emph{order-preserving} iff
+  \[
+    x <_X x' \text{ iff } f(x) <_Y f(x') ~~\text{for all } x, x' \in X.
+  \]
+  If $f$ is injective, it is an \emph{order-embedding}. If $f$ is a bijection,
+  it as \emph{order-isomorphism}.
+\end{definition}
+
+\begin{theorem}
+  For a WO $(X, <)$ there is an ordinal $\ord(X, <)$ such that
+  $(X, <) \approx (\ord(X), \in)$.
+\end{theorem}
+\begin{proof}
+  We define a recursive function $f$ with $\dom(f) = X$ as follows:
+  \[
+    A(x, f \uh x, z) := (f \uh x \text{ is a function } \to z = \ran(f \uh x))
+    \wedge (f \uh x \text{ is no function } \to z = \emptyset)
+  \]
+  and fix $\ord(X, <) := \alpha := \ran(f)$.
+
+  This is an order-isomorphism between $(X, <)$ and $(\alpha, \in)$.
+  \begin{description}
+  \item[surjection:] As $\alpha = \ran(f)$.
+  \item[order $\to$:] Let $x < x'$ then $x \in \IS_<(x')$ and thus $f(x) \in
+    \ran(f \uh x) = f(x')$.
+  \item[injection:] Let $f(x) = f(x')$. By linearity, let w.l.o.g.\ $x < x'$
+    then by the previous clause $f(x) \in f(x') = f(x)$, contradicting foundation.
+  \item[order $\leftarrow$:] Let $f(x) \in f(x') = \ran(f \uh x)$, then there is
+    $x'' \in \dom(f \uh x) = \IS_<(x')$ with $f(x) = f(x'')$. By injectivity we
+    obtain $x = x'' < x'$.
+  \end{description}
+
+  It remains to prove that $\alpha$ is an ordinal.
+  \begin{description}
+  \item[$\forall x \in X.~f(x)$ is ordinal:] Per induction on $x$. Suppose $f(x) = \ran(f \uh x)$ was a
+    set of ordinals. If it is transitive it is an ordinal. Let $\beta
+    \in \ran(f \uh x)$. Then $\beta = \ran(f \uh x')$ for $x' < x$ and thus
+    $\beta \subseteq \ran(f \uh x)$.
+  \item[$\alpha$ transitive:] Let $\beta \in \alpha = \ran(f)$, meaning $\beta = \ran(f
+    \uh x)$ for some $x \in X$, meaning $\beta = \ran(f \uh x) \subseteq \ran(f)$.
+  \end{description}
+\end{proof}
+
+\begin{proposition}
+  Let $\alpha$ and $\beta$ be ordinals such that $(\alpha, \in) \approx (\beta,
+  \in)$. Then $\alpha = \beta$.
+\end{proposition}
+\begin{proof}
+  Let $b : \alpha \to \beta$ be the order-isomorphism. We prove $b(\gamma) =
+  \gamma$ for all $\gamma \in \alpha$ and thus that $\alpha \subseteq \beta$. An
+  analogous argument yields $\beta \subseteq \alpha$.
+  Thus let $\gamma \in \alpha$ such that $f(\delta) = \delta$ for all $\delta
+  \in \gamma$. Then observe that
+  \[
+    f(\gamma) = \{\delta' \mid \delta' \in f(\gamma)\} \stackrel{\star}{=}
+    \{f(\delta) \mid \delta \in \gamma\} \stackrel{IH}{=} \{\delta \mid \delta \in \gamma\} = \gamma
+  \]
+  where the $\star$-step follows from the fact that $(\alpha, \in) \approx
+  (\beta, \in)$ (Exercise!).
+\end{proof}
+
+\begin{corollary}
+  For well-orders $(X, <), (Y, <)$ holds: $(X, <) \approx (Y, <)$ iff $\ord(X,
+  <) = \ord(Y, <)$.
+\end{corollary}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$\to$:] Then $(\ord(X, <), \in) \approx (X, <) \approx (Y, <) \approx
+    (\ord(Y, <), \in)$ and thus $\ord(X, <) = \ord(Y, <)$.
+  \item[$\leftarrow$:] Then $(X, <) \approx (\ord(X, <), \in) = (\ord(Y, <),
+    \in) \approx (Y, <)$.
+  \end{description}
+\end{proof}
+
+\subsection{Ordinal and order arithmetic}
+
+\begin{definition}
+  Let $\Omega$ be some ordinal. We can define arithmetical operations with
+  domain $\Omega \times \Omega$ per recursion:
+  \begin{align*}
+    \alpha + 0 &= \alpha & \alpha \cdot 0 &= 0 & \alpha^0 &= 1 \\
+    \alpha + \beta^+ &= (\alpha + \beta)^+ & \alpha \cdot \beta^+ &= (\alpha \cdot \beta) + \alpha & \alpha^{\beta^+} & = \alpha^\beta \cdot \alpha \\
+    \alpha + \lambda &= \bigcup \{\alpha + \beta \mid \beta \in \lambda\} & \alpha \cdot \lambda &= \bigcup \{\alpha \cdot \beta \mid \beta \in \lambda\} & \alpha^\lambda & = \bigcup \{\alpha^\beta \mid \beta \in \lambda\}
+  \end{align*}
+  where $\lambda$ is a limit ordinal.
+\end{definition}
+
+\begin{remark}
+  we would like to define operations on $\OO \times \OO$ where $\OO$ is the set
+  of ordinals. However, we cannot do this as $\OO$ is not a set. Denote by
+  $+_\Omega$ the $+$-operation above with domain $\Omega \times
+  \Omega$. We can prove that $+_\Omega \subseteq +_{\Omega'}$ for
+  $\Omega \in \Omega'$, i.e. the above induces a cumulative hierarchy of
+  arithmetical operations. Informally, we thus write $\alpha + \beta$ to mean
+  $\alpha +_\Omega \beta$ with $\Omega := \alpha^+ \cup \beta^+$, which `in the
+  limit' agrees with all other $+_{\Omega'}$. The same is true for
+  multiplication and exponentiation.
+\end{remark}
+
+\begin{remark}
+  The operations are not commutative!
+  \begin{align*}
+    1 + \omega &= \bigcup \{1 + n \mid n \in \omega\} = \omega & \omega + 1 &= \omega^+\\
+    2 \cdot \omega &= \bigcup \{2 \cdot n \mid n \in \omega\} = \omega & \omega \cdot 2 &= 0 + \omega + \omega = \omega + \omega
+  \end{align*}
+\end{remark}
+
+\begin{definition}
+  Let $(X, <_X), (Y, <_Y)$ be well-orders then their order sum $(X + Y, <_{X \oplus Y})$ is defined by
+  \[
+    X + Y := (X \times \{0\}) \cup (Y \times \{1\})
+  \]
+  and
+  \[
+    <_{X \oplus Y} := \{((x, 0), (x', 0)) \mid x <_X x'\} \cup \{((x, 0), (y,
+    1)) \mid x \in X, y \in Y\} \cup \{((y, 1), (y', 1)) \mid y <_Y y'\}.
+  \]
+\end{definition}
+
+\begin{proposition}[Goldrei; Theorem 8.8]
+  If $(X, <_X), (Y, <_Y)$ are well-orders with $\alpha = \ord(X, <_X), \beta =
+  \ord(Y, <_Y)$ then $(X + Y, <_{X \oplus Y})$ is a well-order with $\ord(X + Y,
+  <_{X \oplus Y}) = \alpha + \beta$.
+\end{proposition}
+
+\begin{definition}
+  Let $(X, <_X), (Y, <_Y)$ be well-orders then their order product $(X \times Y, <_{X \otimes Y})$ is defined by
+  \[
+    <_{X \otimes Y} := \{((x, y), (x', y')) \mid x, x' \in X, y <_Y y'\} \cup \{((x, y), (x',
+    y)) \mid x <_X x', y \in Y\}
+  \]
+\end{definition}
+
+\begin{proposition}[Goldrei; Theorem 8.10]
+  If $(X, <_X), (Y, <_Y)$ are well-orders with $\alpha = \ord(X, <_X), \beta =
+  \ord(Y, <_Y)$ then $(X \times Y, <_{X \otimes Y})$ is a well-order with $\ord(X \times Y,
+  <_{X \otimes Y}) = \alpha \cdot \beta$.
+\end{proposition}
+
+\begin{definition}
+  Let $(X, <_X), (Y, <_Y)$ be well-orders then their order exponential $(\Exp(X,
+  Y), <_{X^Y})$ is defined by
+  \[
+    \Exp(X, Y) := \{f : Y \to X \mid \{y \in Y \mid f(y) \neq 0_X\} \text{ is finite} \}
+  \]
+  where $0_X = \min X$ and
+  \[
+    f <_{X^Y} g \text{ iff } \exists y \in Y.~f(y) < g(y) \wedge \forall y <
+    y'.~f(y') = g(y').
+  \]
+\end{definition}
+
+\begin{proposition}
+  If $(X, <_X), (Y, <_Y)$ are well-orders with $\alpha = \ord(X, <_X), \beta =
+  \ord(Y, <_Y)$ then $(\Exp(X, Y), <_{X^Y})$ is a well-order with $\ord(\Exp(X, Y),
+  <_{X^Y}) = \alpha^\beta$.
+\end{proposition}
+
+\begin{theorem}[Cantor normal form]
+  For any ordinal $\alpha$ there is a unique $n \in \NN$ and a unique sequence
+  $\beta_1 \geq \ldots \geq \beta_n$ of ordinals such that
+  \[
+    \alpha = \omega^{\beta_1} + \ldots + \omega^{\beta_n}.
+  \]
+\end{theorem}
+
+\printbibliography{}
+
+\end{document}

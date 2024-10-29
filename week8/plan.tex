@@ -1,0 +1,442 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 8}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+\newcommand{\IS}{\text{IS}}
+\newcommand{\ord}{\text{Ord}}
+\newcommand{\Exp}{\text{Exp}}
+\newcommand{\supp}{\text{supp}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\subsection{Hartog's theorem}
+
+\begin{theorem}[Hartog's theorem]
+  For any set $X$, there exists an ordinal $\alpha$ such that $\alpha
+  \not\preceq X$.
+\end{theorem}
+\begin{proof}
+  We shall construct the least such ordinal, which will be
+  \[
+    \alpha := \{\beta \mid \beta \text{ is an ordinal and } \beta \preceq X\}.
+  \]
+  First, suppose $\alpha$ was a set and an ordinal, then clearly if $\alpha
+  \preceq X$ then $\alpha \in \alpha$, contradicting Foundation.
+
+  We begin by proving that $\alpha$ is a set. The following set exists by
+  separation:
+  \[
+    W := \{R \subseteq X \times X \mid (\supp(R), R) \text{ is a well-order}\}
+  \]
+  The following set exists by replacement (we have shown $\ord$ to be a
+  class-level function on $W$ last week):
+  \[
+    A := \{\ord(\supp(R), R) \mid R \in W\}.
+  \]
+  We now claim that $\beta \in A$ iff $\beta$ is an ordinal and $\beta \preceq
+  X$, i.e. that $A = \alpha$:
+  \begin{description}
+  \item[$\to$:] If $\beta \in A$ then $\beta = \ord(\supp(R), R)$ for $R \in W$.
+    This means $\beta$ is an ordinal such that $(\beta, \in) \approx (\supp(R),
+    R)$. This means that $\beta \approx \supp(R) \subseteq X$ as desired.
+  \item[$\leftarrow$:] Let $\beta$ be an ordinal such that there is an injection
+    $i : \beta \to X$. Consider the following relation
+    \[
+      R := \{(i(\gamma), i(\delta)) \mid \gamma, \delta \in \beta\}
+    \]
+    then $i$ is an order-isomorphism between $(\beta, \in)$
+    and $(\ran(i), R)$ per construction of $R$. This means that $(\ran(i), R)$ is
+    a well-order and thus that $R \in W$. Then $\beta = \ord(\ran(i),
+    R)$ and we have $\beta \in A$.
+  \end{description}
+
+  Lastly we have to prove that $\alpha$ is an ordinal. It is a set of ordinals,
+  so it remains to show transitivity: Let $\gamma \in \beta \in \alpha$ then
+  $\gamma \subseteq \beta \preceq X$ and thus $\gamma \preceq X$.
+\end{proof}
+
+\begin{remark}
+  Recall: 
+  \emph{Zorn's lemma} ZL states: Let $X$ be partially ordered by $\sqsubseteq\;
+  \subseteq X \times X$ in such a way that every $\sqsubseteq$-chain $Y \subseteq X$
+  has an upper bound in $X$. Then $X$ has a $\sqsubseteq$-maximal element.
+\end{remark}
+
+\begin{theorem}
+  The axiom of choice implies Zorn's lemma.
+\end{theorem}
+\begin{proof}
+  Suppose $(X, \sqsubseteq)$ was a partial order and chain-closed. Suppose $X$
+  had no $\sqsubseteq$-maximal element. Let $Y \subseteq X$ be a chain, then
+  there exists an upper bound $Y \sqsubseteq x$. Because there are no maximal
+  elements, there must be $x \sqsubset y$ and thus every chain has a strict
+  upper bound $Y \sqsubset y$.
+  By the AC, there exists a choice
+  function $c : \Pi Y \in \{Y \subseteq X \mid Y \text{ a chain} \}.~\{y \in X
+  \mid Y \sqsubset y\}$.
+
+  By Hartog's
+  theorem, there exists an ordinal $\alpha$ such that $\alpha \not\preceq X$.
+  We shall now construct an injection $\alpha \to X$, contradicting $X
+  \not\approx \alpha$. Consider the recursive function $i : \alpha \to X$:
+  \[
+    i(\beta) :=
+    \begin{cases}
+      c(\ran(i \uh \beta)) & \text{ if } i \uh \beta \text{ an $\sqsubset$-chain} \\
+      \emptyset & \text{otherwise}
+    \end{cases}
+  \]
+
+  First, observe that for every $\beta \in \alpha$, we have $i(\beta) \in X$ and
+  for any $\ran(i \uh \beta) \sqsubset i(\beta)$. Proof per
+  induction on $\beta$: First, observe that $\ran(i \uh \beta)$ is a chain
+  as $i(\delta) \sqsubset i(\gamma)$ if $\delta \in \gamma \in \beta$, per IH of
+  $\gamma$.
+  Thus $i(\beta) = c(\ran(i \uh \beta)) \in X$ and thus $\ran(i \uh \beta) \sqsubset
+  i(\beta)$ as claimed.
+
+  From $\ran(i \uh \beta) \sqsubset i(\beta)$ it also follows directly that $i :
+  \alpha \to X$ is an injection.
+\end{proof}
+
+\subsection{The $\aleph$s}
+
+\begin{definition}
+  We call $\alpha$ \emph{initial} if for all $\beta \in \alpha$ we have $\beta \prec \alpha$.
+\end{definition}
+
+\begin{lemma}
+  For every ordinal $\alpha$ there is a \emph{unique} initial ordinal
+  $\beta \approx \alpha$.
+\end{lemma}
+\begin{proof}
+  Consider
+  \(
+    B := \{\gamma \leq \alpha \mid \gamma \approx \alpha\}.
+  \)
+  We claim that $\beta := \min B$ is as desired. Clearly $\beta \approx \alpha$.
+  \begin{description}
+  \item[initial:] $\beta$ is infinite at $\alpha$ is. Suppose there was $\gamma
+    \in \beta$ such that $\beta \preceq \gamma$, then $\alpha \approx \beta
+    \preceq \gamma$ and thus $\gamma \approx \alpha$. But then $\gamma \in B$ and
+    thus $\beta \neq \min B$.
+  \item[unique:] Suppose there was another initial $\gamma \leq \alpha$ with
+    $\gamma \approx \alpha$. By linearity, it suffices to w.l.o.g.\ rule out
+    $\gamma \in \beta$. If this was the case, $\gamma \prec \beta$ but this
+    cannot be the case as $\gamma \approx \alpha \approx \beta$.
+  \end{description}
+\end{proof}
+
+\begin{definition}
+  We define the \emph{sequence of infinite initial ordinals} $\aleph_\bullet$ by
+  transfinite recursion:
+  \begin{align*}
+    \aleph_0 & := \omega \\
+    \aleph_{\alpha^+} & := \text{the least initial } \gamma \text{ such that } \aleph_\alpha \prec \gamma \\
+    \aleph_{\lambda} & := \bigcup \{\aleph_\gamma \mid \gamma \in \lambda\}
+  \end{align*}
+  where $\lambda$ is a limit.
+\end{definition}
+
+\begin{lemma}
+  For any ordinal $\alpha$, $\aleph_\alpha$ is initial.
+\end{lemma}
+\begin{proof}
+  Induction on $\alpha$. The $0$ and successor cases are obvious. Thus, let
+  $\alpha = \lambda$ be a limit such that all $\aleph_\beta$ for $\beta \in
+  \lambda$ are initial. We have to show that is $\gamma \in \lambda$ then
+  $\lambda \not\preceq \gamma$. We know that $\gamma \in \aleph_\beta$ for $\beta
+  \in \gamma$. If $\lambda \preceq \gamma$ then $\aleph_\beta \preceq \lambda
+  \preceq \gamma$, contradicting the initiality of $\aleph_\beta$.
+\end{proof}
+
+\begin{fact}
+  If $\alpha \in \beta$ then $\aleph_\alpha \prec \aleph_\beta$.
+\end{fact}
+
+\begin{lemma}
+  Let $\alpha$ be infinite and initial. Then there exists $\beta$ such that $\alpha = \aleph_\beta$.
+\end{lemma}
+\begin{proof}
+  We first prove that for any $\alpha$, $\alpha \leq \aleph_\alpha$.
+  \begin{description}
+  \item[$0$:] Clearly $0 \leq \omega$.
+  \item[$\beta^+$:] If $\beta^+$ is finite then $\beta^+ \in \aleph_0 \leq
+    \alpha_{\beta^+}$. If $\beta^+$ is infinite then $\beta^+ \approx \beta \leq
+    \aleph_\beta \prec \aleph_{\beta^+}$.
+  \item[$\lambda$ limit:] Observe that for all $\beta \in \lambda$ we have
+    $\beta \leq \aleph_\beta \leq \aleph_\lambda$ and thus $\lambda \subseteq
+    \aleph_\lambda$, meaning $\lambda \leq \aleph_\lambda$.
+  \end{description}
+
+  Consider
+  \[
+    X := \{\beta \leq \alpha \mid \aleph_\beta \leq \alpha\}.
+  \]
+  Clearly, $X$ is transitive as $\aleph_\gamma \leq \aleph_\beta$ for $\gamma
+  \in \beta$, and thus $X$ is some ordinal. We claim that it is a successor:
+  \begin{description}
+  \item[$0 \in X$:] As $\alpha$ is infinite, $\omega = \aleph_0 \leq \alpha$.
+  \item[$X$ no limit:] Suppose $X$ was a limit. Because $\aleph_\beta \leq
+    \alpha$ for all $\beta \in X$, this means that $\aleph_X = \bigcup
+    \{\aleph_\beta \mid \beta \in X\} \leq \alpha$.
+    Because $X \leq \alpha$ per construction, this
+    would mean $X \in X$, a contradiction.
+  \end{description}
+
+  Hence $X = \beta^+$ for some ordinal $\beta$. We claim $\alpha =
+  \aleph_\beta$. We know that $\aleph_\beta \leq \alpha < \aleph_{\beta^+}$
+  because $\beta^+ \not\in X$. Because $\aleph_\beta, \alpha, \aleph_{\beta^+}$
+  are all initial and $\aleph_{\beta^+}$ is the least initial ordinal larger
+  than $\aleph_\beta$, we obtain $\alpha = \aleph_\beta$.
+\end{proof}
+
+\newpage
+
+\section{Lecture 2}
+
+\subsection{Defining $\abs{X}$}
+
+\begin{definition}
+  Let $X$ be a set. Its cardinality $\abs{X}$ is any initial ordinal $\alpha$
+  with $X \approx \alpha$.
+\end{definition}
+
+\begin{remark}
+  If $\abs{X}$ exists then $\abs{X} = \aleph_\alpha$ for some ordinal $\alpha$.
+\end{remark}
+
+\begin{lemma}
+  Let $\abs{X}, \abs{Y}$ exist. Then $\abs{X} = \abs{Y}$ iff $X \approx Y$.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$\to$:] Then $X \approx \abs{X} = \abs{Y} \approx Y$.
+  \item[$\leftarrow$:] Then $\abs{X} \approx X \approx Y \approx \abs{Y}$ and
+    because $\abs{X}, \abs{Y}$ are initial, this means $\abs{X} = \abs{Y}$.
+  \end{description}
+\end{proof}
+
+\begin{corollary}
+  For any set $X$, if $\abs{X}$ exists it is unique.
+\end{corollary}
+
+\begin{theorem}
+  The following statement in equivalent to the AC: For every set $X$, $\abs{X}$ exists.
+\end{theorem}
+\begin{proof}
+  \
+  \begin{description}
+  \item[AC $\to$ Statement:] The WPO yields a well-order $(X, <)$. Then
+    there exists $\alpha := \ord(X, <) \approx (X, <)$. Ultimately, there
+    exists an initial ordinal $\beta \approx \alpha \approx X$.
+  \item[Statement $\to$ AC:] We prove the WPO. Let $X$ be a set, then there is
+    an ordinal $X \approx \abs{X}$. Let $b : X \to \abs{X}$ be the bijection,
+    then $X$ is well-ordered by
+    \[
+      x < x' \text{ iff } b(x) \in b(x').
+    \]
+  \end{description}
+\end{proof}
+
+\begin{remark}
+  We shall now study the arithmetic of cardinal numbers. To do this, we will
+  pretend that all cardinalities we treat exist. Formally, this means we either
+  assume AC, which just grants the existence of all cardinalities, or we make
+  all statements and definitions conditional on the existence of all
+  cardinalities involved.
+\end{remark}
+
+\subsection{Cardinal arithmetic}
+
+\begin{definition}
+   Let $X$ and $Y$ be sets. We define
+   \begin{align*}
+     \abs{X} + \abs{Y} & := \abs{X + Y} = \abs{X \times \{0\} \cup Y \times \{1\}} \\
+     \abs{X} \cdot \abs{Y} & := \abs{X \times Y} \\
+     \abs{X}^{\abs{Y}} & := \abs{X^Y}
+   \end{align*}
+\end{definition}
+
+\begin{remark}
+  We extend this notation to the $\aleph$s. For example, we often write
+  $\aleph_\alpha^{\aleph_\beta}$ to formally mean
+  $\abs{\aleph_\alpha}^{\abs{\aleph_\beta}}$ because we know that
+  $\abs{\aleph_\gamma} = \aleph_\gamma$.
+\end{remark}
+
+\begin{lemma} Although $\aleph_0 = \NN = \omega$,
+  \[
+    \text{(as cardinals)  } \aleph_0^{\aleph_0} \not\approx \omega^\omega
+    \text{  (as ordinals)}.
+  \]
+\end{lemma}
+\begin{proof}
+  Observe that $\omega^\omega \approx \Exp(\omega, \omega) = \{f : \omega \to
+  \omega \mid \{n \in \omega \mid f(n) > 0\} \text{ is finite}\} \approx \omega$.
+
+  On the other hand, $\aleph_0^{\aleph_0} \approx 2^{\aleph_0} \succ \aleph_0 = \omega$.
+\end{proof}
+
+\begin{theorem}
+  If $X, Y$ are infinite then
+  \[
+    \abs{X} \cdot \abs{Y} = \max \{\abs{X}, \abs{Y}\} = \abs{X} + \abs{Y}.
+  \]
+\end{theorem}
+\begin{proof}
+  We first prove that $\alpha \times \alpha \approx \alpha$ for all infinite
+  ordinals. Induction on $\alpha$.
+  \begin{description}
+  \item[$\omega$:] We have shown $\NN \approx \NN \times \NN$ before.
+  \item[$\beta^+$:] Then $\beta^+ \approx \beta \stackrel{IH}{\approx} \beta \times \beta
+    \approx \beta^+ \times \beta^+$ because $\beta \approx \beta^+$.
+  \item[$\lambda$ limit:] If $\lambda$ is not initial then there is $\gamma \in
+    \lambda$ with $\lambda \approx \gamma \approx \gamma \times \gamma \approx
+    \lambda \times \lambda$.
+
+    Thus, suppose $\lambda$ was initial. We begin by defining a well-ordering $(\lambda
+    \times \lambda, \sqsubset)$:
+    \begin{align*}
+      (\alpha, \beta) \sqsubset (\alpha', \beta') & \text{ if } \max \{\alpha, \beta\} < \max \{\alpha', \beta'\} \\      & \text{ or } \max \{\alpha, \beta\} = \max \{\alpha', \beta'\} \text{ and } \alpha < \alpha' \\
+      & \text{ or } \max \{\alpha, \beta\} = \max \{\alpha', \beta'\} \text{ and } \alpha = \alpha' \text{ and } \beta < \beta'
+    \end{align*}
+    This is a well-order and furthermore, we have that for any $\gamma \in \lambda$,
+    $(\gamma \cdot \gamma, \in) \approx \IS_{\sqsubset}((\gamma \cdot \gamma, 0))$
+    [Exercise 7.69]. Thus $(\bigcup \{\gamma \cdot \gamma \mid \gamma \in
+    \lambda\}, \in) \approx (\lambda \times \lambda, \sqsubset)$.
+
+    We know that $(\gamma \cdot \gamma, \in) \approx (\gamma \times \gamma,
+    <_\otimes)$. We thus know that $\gamma \stackrel{IH}{\approx} \gamma \times \gamma \approx
+    \gamma \cdot \gamma$ as sets. Because $\gamma \prec \lambda$, it follows
+    that $\gamma \cdot \gamma \prec \lambda$. Hence
+    \[
+      \lambda \times \lambda \approx \bigcup \{\gamma \cdot \gamma \mid \gamma
+      \in \lambda\} \leq \lambda.
+    \]
+    Trivially, $\lambda \prec \lambda \times \lambda$ thus the claim follows by CSB.
+  \end{description}
+
+  Now suppose, w.l.o.g., that $\abs{X} = \aleph_\alpha \preceq \aleph_\beta = \abs{Y}$. Then
+  \[
+    \aleph_\beta \preceq \aleph_\beta + \aleph_\alpha \preceq \aleph_\beta +
+    \aleph_\beta \approx \aleph_\beta \times 2 \preceq \aleph_\beta \times \aleph_\beta \approx \aleph_\beta
+  \]
+  and
+  \[
+    \aleph_\beta \preceq \aleph_\beta \cdot \aleph_\alpha \preceq \aleph_\beta \cdot \aleph_\beta \approx \aleph_\beta \times \aleph_\beta \approx \aleph_\beta.
+  \]
+\end{proof}
+
+\subsection{Continuum Hypothesis, revisited}
+
+\begin{definition}
+  We defined the continuum hypothesis as follows: For any $X \subseteq \RR$ one
+  of the following applies:
+  \begin{itemize}
+  \item $X$ is finite
+  \item $X \approx \NN$
+  \item $X \approx \RR$
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}
+  The continuum hypothesis can be stated as $2^{\aleph_0} = \aleph_1$.
+\end{lemma}
+\begin{proof}
+  Let $\RR = 2^\NN \approx \aleph_1$ and let $b : \RR \to \aleph_1$ witness
+  this. Then any $X \subseteq \RR$ can be well-ordered by
+  \[
+    x < x' \text{ iff } b(x) \in b(x').
+  \]
+  Consider $\alpha := \ord(X, <)$. There exists an initial $\beta \approx
+  \alpha$. Clearly, $\beta \leq \aleph_1$ meaning one of the following holds:
+  \begin{itemize}
+  \item $\beta$ is finite or
+  \item $\beta = \aleph_0$ or
+  \item $\beta = \aleph_1$.
+  \end{itemize}
+\end{proof}
+
+\begin{definition}
+  The \emph{generalized continuum hypothesis} states that $2^{\aleph_\alpha} =
+  \aleph_{\alpha + 1}$.
+\end{definition}
+
+\begin{theorem}
+  We know that $2^{\aleph_0} \not\approx \aleph_\omega$.
+\end{theorem}
+\begin{proof}
+  Suppose $2^{\aleph_0} = 2^\NN \approx \aleph_\omega$. Because $(2^\NN) \approx (2^\NN)^\NN$,
+  we can obtain a surjection $b : \aleph_\omega \to (\NN \to \aleph_\omega)$. Then we define
+  a function $g : \NN \to \aleph_\omega$ such that $g \not\in \ran(b)$ as
+  follows
+  \[
+    g(n) := \min (\aleph_\omega \setminus \{f(\beta)(n) \mid \beta \in \aleph_n\}).
+  \]
+  Because $\aleph_n \prec \aleph_\omega$, the set whose minimum $g(n)$ is
+  defined as is never empty and thus $g$ well-defined. We show that $g \not\in
+  \ran(b)$: Suppose $g = f(\alpha)$ with $\alpha \in \aleph_\omega$, meaning
+  $\aleph \in \aleph_n$. But then $f(\alpha)(n) \neq g(n)$.
+\end{proof}
+
+\printbibliography{}
+
+\end{document}

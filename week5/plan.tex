@@ -1,0 +1,464 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 5}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\emph{Material:} Section 5.2
+
+\begin{definition}
+  The \emph{axiom of choice} \textsc{AC} states the following: Let $\FF$ be a set such that
+  for all $A \in \FF$ we have $A \neq \emptyset$. Then there exists a function
+  $c : \FF \to \bigcup \FF$ such that for all $A \in \FF$, $c(A) \in A$. We call
+  $c$ a \emph{choice function}.
+\end{definition}
+
+\begin{lemma}[Inverting surjections]
+  Let $f : X \to Y$ be a surjection. Then there exists an injection $g : Y \to
+  X$ such that $f(g(y)) = y$ for all $y \in Y$.
+\end{lemma}
+\begin{proof}
+  For $x, x' \in X$ we set $x \sim x'$ iff $f(x) = f(x')$. This is an
+  equivalence relation. Setting $\FF = X_{/ \sim}$, there exists a choice
+  function $c : X_{/ \sim} \to X$ such that for each $\cls{x} \in X_{/ \sim}$ we
+  have $c(\cls{x}) \in \cls{x}$. Now define
+  \[
+    g(y) \coloneq c(\{x \in X \mid f(x) = y\}).
+  \]
+  It is clear that $f(g(y)) = y$. For injectivity, let $y, y'$ be such that
+  $g(y) = g(y')$. But then $y = f(g(y)) = f(g(y')) = y'$.
+\end{proof}
+
+\begin{remark}
+  We will soon show that AC is actually required to prove this.
+\end{remark}
+
+\begin{definition}
+  We define two more forms of the AC:
+  \begin{description}
+  \item[Disjoint form:] Let $\FF$ be such that for each $A, A' \in \FF$, $A \neq
+    \emptyset$ and if $A \neq A'$ then $A \cap A' = \emptyset$. Then there
+    exists a choice function $c : \FF \to \bigcup \FF$.
+  \item[Power set form:] Fix a set $A \neq \emptyset$. Then there exists a
+    choice function $c : (\pow(A) \setminus \{\emptyset\}) \to A$.
+  \end{description}
+\end{definition}
+
+\begin{theorem}
+  The three forms of AC are equivalent.
+\end{theorem}
+\begin{proof}
+  \
+  \begin{description}
+  \item[AC to Power set:] Simply observe that $\pow{A} \setminus \{\emptyset\}$
+    is a suitable family for AC.
+  \item[Power set to Disjoint:] Let $\FF$ be a disjoint family. Observe that
+    $\FF \subseteq \pow(\bigcup \FF) \setminus \{\emptyset\}$, meaning we can
+    obtain a choice function on $\FF$ by restricting that on $\pow(\bigcup \FF) \setminus \{\emptyset\}$.
+  \item[Disjoint to AC:] Let $\FF$ be an arbitrary family with $A \neq
+    \emptyset$ for all $A \not \FF$. Using replacement, construct
+    \[
+      \FF' := \{A \times \{A\} \mid A \in \FF\}.
+    \]
+    Then $\FF'$ is a disjoint family: Let $A \times \{A\}, A' \times \{A\} \in
+    \FF'$ be distinct. Suppose there was $\langle a, B \rangle \in A \times
+    \{A\} \cap A' \times \{A'\}$. By construction, $A = B = A'$, contradicting
+    their distinctness.
+
+    Now we simply obtain the desired choice function via
+    \[
+      \FF \ni A \mapsto A \times \{A\} \in \FF' \xrightarrow{c} \bigcup \FF' \ni
+      \langle a, A \rangle \mapsto a \in \bigcup \FF.
+    \]
+  \end{description}
+\end{proof}
+
+\begin{lemma}
+  Invertability of surjections implies AC.
+\end{lemma}
+\begin{proof}
+  Suppose every surjection $f : X \to Y$ had an inverse $g : Y \to X$ with $y =
+  f(g(y))$ for all $y \in Y$. We prove disjoint AC: Let $\FF$ be disjoint. Then
+  the following is a surjection
+  \[
+    f := \bigcup \FF \ni a \mapsto A \in \FF \text{ s.t. } a \in A.
+  \]
+  Then it has an inverse $g : \FF \to \bigcup \FF$ such that $f(g(A)) = A$, i.e.
+  $g(A) \in A$. This is the desired choice function.
+\end{proof}
+
+\begin{description}
+\item[Desirable consequences:] 
+  \
+  \begin{enumerate}
+  \item Logic: Completion into of maximal consistent theories
+    (~Completeness and Compactness)
+  \item CT: Any full, faithful, essentially surjective functor is an equivalence
+  \item Linear algebra: Every vector space has a basis $\star$
+  \item Algebra: Krull's theorem
+  \item Topology: Products of compact spaces are compact
+  \end{enumerate}
+  \
+\item[Dubious consequences:]
+  \
+  \begin{enumerate}
+  \item Intuitionistically: LEM
+  \item Banach-Tarski: A ball in $\RR^3$ can be partitioned into finitely many
+    parts which, using translations and rotations, can be recombined into two balls.
+  \end{enumerate}
+\end{description}
+
+
+\begin{definition}
+  We define another form of the AC:
+  \begin{description}
+  \item[Index form:] Let $I$ be a set and $A$ a function with $\dom(A) = I$ such
+    that $A_i \neq \emptyset$ for all $i \in I$.
+    Then there exists a function $c : \Pi i \in I.~A_i$, i.e. a function $c : I
+    \to \bigcup_{i \in I} A_i$ such that $c(i) \in A_i$ for all $i \in I$.
+  \end{description}
+\end{definition}
+
+\begin{exercise}
+  The index form and plain AC are equivalent.
+\end{exercise}
+
+\begin{lemma}
+  Let $n \in \NN$ and let $A$ be a function with $\dom(A) = n$ and $A_i \neq
+  \emptyset$ for all $i < n$. Then there
+  exists $c : \Pi i < n.~A_i$.
+\end{lemma}
+\begin{proof}
+  Induction on $n$.
+  \begin{description}
+  \item[$n = 0:$] Then $n = \emptyset$, thus $c = \emptyset$ is the desired function.
+  \item[$n + 1:$] Suppose there was $c' : \Pi i < n.~A_i$. We know that $A_n \neq
+    \emptyset$ and thus there is an $a_n \in A_n$. Then
+    \[
+      c := c' \cup \{(n, a_n)\} : \Pi i < n + 1.~A_i
+    \]
+    exists as desired.
+  \end{description}
+\end{proof}
+
+\begin{remark}
+  The aforementioned theorem already fails for $I = \NN$. Crucially,
+  \[
+    c := \bigcup \{c_i \mid i \in \NN\} \text{ for sequence } c_i \subseteq c_{i +
+    1} : \Pi j < i + 1.~A_j
+  \]
+  fails generally, because we cannot pick \emph{unique} $c_i$ to construct such
+  a sequence. (Compare recursion theorem)
+\end{remark}
+
+
+\newpage
+
+\section{Lecture 2}
+
+\emph{Material:} Section 5.4
+
+\begin{theorem}
+  There is a function $c : \pow(\NN) \setminus \{\emptyset\} \to \NN$.
+\end{theorem}
+\begin{proof}
+  Simply take $c(A) := \text{least } n \in A$. As $\NN$ is well-ordered by
+  $\leq$ this always exists and is unique.
+\end{proof}
+
+
+\begin{definition}
+  The \emph{well-ordering principle} WOP states: For every set $X$ there exists
+  a relation $\prec\; \subseteq X \times X$ which well-orders $X$.
+\end{definition}
+
+\begin{corollary}
+  The WOP implies AC.
+\end{corollary}
+
+
+\begin{definition}
+  A relation $\preceq\; \subseteq X \times X$ is a \emph{partial order} if it is
+  reflexive, antisymmetric and transitive. A set $Y \subseteq X$ is a
+  \emph{$\preceq$-chain} if $\preceq$ is total on $X$. An element $x \in X$ is
+  \emph{maximal} if there is no $x \prec x'$.
+\end{definition}
+
+\begin{definition}
+  \emph{Zorn's lemma} ZL states: Let $X$ be partially ordered by $\preceq\;
+  \subseteq X \times X$ in such a way that every $\preceq$-chain $Y \subseteq X$
+  has an upper bound in $X$. Then $X$ has a $\preceq$-maximal element.
+\end{definition}
+
+\begin{theorem}
+  The AC implies Zorn's lemma.
+\end{theorem}
+\begin{remark}
+  We will give a simple proof of this at the end of the course.
+\end{remark}
+% \begin{proof}
+%   \TODO{Fix me!}
+%
+%   Suppose $X$ had no maximal element. That means for each chain $Y \subseteq X$
+%   there exists a strict upper bound $Y \prec y$: We know there is $Y \preceq
+%   y'$, an upper bound on $Y$. If there was no $y' \prec y$, $y'$ would be
+%   maximal. Hence, consider the following function
+%   \[
+%     c : \Pi Y \in \{Y \subseteq X \mid Y \text{ a $\prec$-chain}\}.~\{y \in X
+%     \mid Y \prec y\}
+%   \]
+%   which chooses such a strict upper bound for each chain. Let $Y \subseteq X$ be
+%   a chain and $x \in Y$ then we write $Y \uh x := \{y \in Y \mid y < x\}$ for
+%   its initial segment in $Y$. We say a chain $A \subseteq X$ is a $c$-chain if:
+%   \begin{enumerate}
+%   \item $A$ is well-ordered by $\prec$
+%   \item if for every $a \in A$ we have $a = c(A \uh a)$.
+%   \end{enumerate}
+
+%   Now consider
+%   \[
+%     C := \{A \subseteq X \mid A \text{ is a $c$-chain}\} \text{  and  } U :=
+%     \bigcup C
+%   \]
+%   \begin{enumerate}
+%   \item If $A, B \in C$ distinct then $B = A \uh a$ for $a \in A$ or $A = B \uh
+%     b$ for $b \in B$: Let w.l.o.g.\ $b \in B \setminus A$ be minimal. Then $A =
+%     B \uh b$. Suppose not, then let $a \in A \setminus (B \uh b)$ be minimal.
+%   \item If $A \in C$ and $a \in A$ then $U \uh a = A \uh a$: Only $U \uh a
+%     \subseteq A \uh a$ needs to be argued. Let $b \prec a$
+%     with $b \in U$. Then $b \in B \in C$. We distinguish two cases:
+%     \begin{description}
+%     \item[$A = B \uh c$:] Then $a \preceq c$ as $a \in A$ and $b \in A$ as $b
+%       \prec a \preceq c$ and thus $b \in A \uh a$.
+%     \item[$B = A \uh c$:] Then $b \in A \uh a$. \TODO{Clean}
+%     \end{description}
+%   \item $U$ is a chain: Let $y, z \in U$. Then there are $c$-chains $(y \in Y),
+%     (z \in Z) \in U$. Let w.l.o.g.\ $Y \subseteq Z$ then $y, z \in Z$ and thus
+%     $y \prec z$ or $y = z$ or $z \prec y$.
+%   \item $U$ is well-ordered by $\prec$: Let $Y \subseteq U$ and $a \in Y$. Then
+%     $a \in A \in C$. We know that $U \uh a \subseteq A$ and thus $Y' := (U \uh a \cup \{a\})
+%     \cap Y \subseteq A$. As $A$ is well-ordered by $\prec$, there is $b \in Y'$
+%     with $b \preceq Y'$. Then $b \preceq Y$: Let $c \in Y \setminus Y'$ then $b
+%     \preceq a \prec c$.
+%   \item For $a \in U$, $a = c(U \uh a)$. Observe that $a \in A \in C$ and $a =
+%     c(A \uh a) = c(U \uh a)$.
+%   \end{enumerate}
+%   Hence, $U \in C$. Consider $u = c(U)$ and observe that $U < u$ and $U \cup
+%   \{u\} \in C$. But then $x \in C$ and thus $x \in U$. But this contradicts $U <
+%   u$.
+% \end{proof}
+
+\begin{theorem}
+  Zorn's lemma implies WOP.
+\end{theorem}
+\begin{proof}
+  Let $X$ be a set. For $R \subseteq X \times X$ define the \emph{support of
+    $R$} as $\sup(R) := \{x \in X \mid \exists y \in X.~(x, y) \in R \vee (y, x)
+  \in R\}$. Consider the set
+  \[
+    W = \{R \subseteq X \times X \mid R \text{ well-orders } \sup(R)\}.
+  \]
+  Then $W$ is partially ordered by $R \sqsubseteq R'$: $R \subseteq R'$ and for
+  every $x \in \sup(R)$ and $y \in \sup(R') \setminus \sup(R)$ we have $(x, y)
+  \in R'$.
+
+  We claim that every $\sqsubseteq$-chain in $W$ has an upper bound: Let $U \subseteq W$ be
+  a $\sqsubseteq$-chain. First of all, $V := \bigcup U$ is in $W$.
+  \begin{description}
+  \item[irreflexive:] Suppose $(x, x) \in V$ then $(x, x) \in R \in U$
+    but that entails $R \not\in W$.
+  \item[transitive:] Suppose $(x, y), (y, z) \in V$ then $(x, y) \in R,
+    (y, z) \in R'$ with $R, R' \in U$. As $U$ is a $\sqsubseteq$-chain, w.l.o.g. $R \subseteq
+    R'$ and thus $(x, y) \in R'$, yielding $(x, z) \in R'$ and thus $(x, z) \in
+    V$.
+  \item[linear:] Let $x, y \in \sup(V)$ then $x \in \sup(R), y \in
+    \sup(R')$ for $R, R' \in U$. Again, w.l.o.g.\ $R \subseteq R'$ by
+    $\sqsubseteq$-linearity of $U$ and thus $x, y \in \sup(R')$ meaning $(x, y) \in
+    R'$ or $(y, x) \in R'$ which transfer to $V$.
+  \item[well-order:] Let $A \subseteq \sup(V)$ such that $x \in A$. Then
+    $x \in \sup(R)$ for $R \in U$. Then $A' := \{y \in A \mid (y, x) \in V \} \subseteq
+    \sup(R)$: Suppose not, i.e.\ suppose there was $z \in \sup(V) \setminus \sup(R)$ such that
+    $(z, x) \in V$. There must be $R' \in U$ such that $(z, x) \in R'$. As $z
+    \not\in \sup(R)$ we know that $R \sqsubseteq R'$ by $\sqsubseteq$-linearity.
+    But that would entail $(x, z) \in R'$ and thus $(x, x) \in R'$,
+    contradicting the linearity of $R'$.
+
+    Hence $A' := \{y \in A \mid (y, x) \in V\} \subseteq \sup(R)$. Let $m :=
+    \min_R A'$ then we claim $m = \min_V A$. Let $z \in A \setminus A'$ we know
+    that $m V x V z$.
+  \end{description}
+  Now we claim that $V$ is a $\sqsubseteq$-upper bound on $U$: Let $R \in U$,
+  clearly $R \subseteq U$. Now suppose $x \in \sup(R)$ and $y \in \sup(U)
+  \setminus \sup(R)$ then there must be $R' \sqsupseteq R$ in $U$ such that $y
+  \in \sup(R')$ and thus $(x, y) \in R' \subseteq V$.
+
+  Then there must be a $\sqsubseteq$-maximal element $R$ of $W$. Suppose there
+  was $x \in X \setminus \sup(R)$, then we can obtain a $R' \sqsupset R$ by taking
+  \[R' := R \bigcup \{(y, x) \mid y \in \sup(R)\}.\]
+  \emph{Exercise:} $R' \in W$. Thus $R$ could not have been maximal after all.
+\end{proof}
+
+\begin{remark}
+  This ``closes'' the circle AC iff ZL iff WPO.
+\end{remark}
+
+\begin{lemma}
+  Under Zorn's lemma, there is an injection $A \to B$ or an injection $B \to A$.
+\end{lemma}
+\begin{proof}
+  Consider
+  \[
+    I := \{f \subseteq A \times B \mid f \text{ an injection} \}
+  \]
+  which is pre-ordered by $\subseteq$. Now let $C \subseteq I$ be a
+  $\subseteq$-chain, then $\bigcup C$ is an injection (\emph{Exercise}!).
+  By Zorn's lemma, there is a maximal $f \in I$. We distinguish three cases:
+  \begin{description}
+  \item[$\dom(f) = A$:] Then $f : A \to B$ is an injection as desired.
+  \item[$\ran(f) = B$:] Then $f^{-1} := \{(b, a) \mid (a, b) \in f\}$ is an
+    injection $f^{-1} : B \to A$. (Observe that $f$ is functional iff $f^{-1}$
+    is injective).
+  \item[$\dom(f) \subset A$ and $\ran(f) \subset A$:] Then there are $a \in A
+    \setminus \dom(f)$ and $b \in B \setminus \ran(f)$. Then
+    \[
+      f' := f \bigcup \{(a, b)\}
+    \]
+    is an injection with $f \subset f'$, so $f$ was not maximal after all.
+  \end{description}
+\end{proof}
+
+
+% \newpage
+
+% \section{Exercises}
+
+% \begin{exercise}
+%   The index form and plain AC are equivalent.
+% \end{exercise}
+% \begin{solution}
+%   \begin{description}
+%   \item[Index to AC:] Simply take $I := \FF$ and $A_{B \in \FF} := B$.
+%   \item[AC to Index:] Take $\FF := \{A_i \mid i \in I\}$, yielding a choice function $c' : \FF \to
+%     \bigcup \FF$. Then take $c(i) := c(A_i) : \Pi i \in I.~A_i$.
+%   \end{description}
+% \end{solution}
+
+% \begin{exercise}[5.10]
+%   The \emph{invertability of injections} states that if $f : X \to Y$ with $X
+%   \neq \emptyset$ is an
+%   injection, there is a sujrection $g : Y \to X$ such that $g(f(x)) = x$ for all
+%   $x \in X$.
+
+%   Does this principle require AC? Is it equivalent to AC?
+% \end{exercise}
+% \begin{solution}
+%   It does not require AC. Fix $b \in X$ then we define
+%   \[
+%     g(y) :=
+%     \begin{cases}
+%       x & y = f(x) \text{ for some } x \in X \\
+%       b & \text{otherwise}
+%     \end{cases}.
+%   \]
+%   Let $x \in X$ then $g(f(x)) = x$ because $f$ is an injection, i.e. there is no
+%   $x' \neq x$ with $f(x') = f(x)$. For surjectivity, simply observe again that
+%   $g(f(x)) = x$ and thus $\ran(g) = X$.
+% \end{solution}
+
+% \begin{exercise}[5.11]
+%   The AC is equivalent to: For every $R \subseteq A \times B$ there exists a
+%   function $f : \dom(R) \to B$ with $f \subseteq R$.
+% \end{exercise}
+% \begin{proof}
+%   \begin{description}
+%   \item[AC to Statement:] Use the index form with $I = \dom(R)$ and $A_a := \{b
+%     \in B \mid (a, b) \in R\}$.
+%   \item[Statement to AC:] Fix $\FF$ as usual. Then define the relation as
+%     follows:
+%     \[
+%       R := \{
+%       (F, f) \in \FF \times \bigcup \FF \mid f \in F
+%       \}
+%     \]
+%     We obtain a function $c : \FF \to \bigcup \FF$ such that $c \subseteq R$,
+%     meaning $c(F) \in F$ for all $F \in \FF$.
+%   \end{description}
+% \end{proof}
+
+% \begin{exercise}[5.24]
+%   Zorn's lemma implies AC.
+% \end{exercise}
+% \begin{solution}
+%   Observe that, by the lecture, ZL $\to$ WPO $\to$ AC. We give a direct proof.
+
+%   We prove the equivalent statement of 5.11: For $R \subseteq A \times B$ there
+%   exists $f : \dom(R) \to B$. Consider the set
+%   \[
+%     P = \{f \subseteq A \times B \mid f \text{ a function and } f \subseteq R\}
+%   \]
+%   which is partially ordered by $\subseteq$. We have shown before that this is
+%   closed under chains. Hence there is a maximal $f \in P$. If $\dom(f) \neq
+%   \dom(R)$, we could extend $f$, contradicting maximality. Hence $f : \dom(R)
+%   \to B$.
+% \end{solution}
+
+\printbibliography{}
+
+\end{document}

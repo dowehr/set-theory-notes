@@ -1,0 +1,445 @@
+\documentclass{whrartcl}
+
+\title{Set theory: Week 4}
+\author{Dominik Wehr, University of Gothenburg}
+\date{Updated: \today}
+
+\usepackage[inference]{semantic}
+\usepackage{mathpartir}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{bussproofs}
+
+% Fix \mu in the bibliography
+\DeclareUnicodeCharacter{03BC}{$\mu$}
+\usepackage[
+  style=numeric-comp,
+  sorting=nyt,
+  maxbibnames=99,
+  backref=false,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false,
+  backend=biber
+  ]{biblatex}
+\bibliography{bibliography}
+
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\PP}{\textbf{P}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\Aa}{\mathcal{A}}
+\newcommand{\Bb}{\mathcal{B}}
+\newcommand{\Vv}{\mathcal{V}}
+\newcommand{\WW}{\textbf{W}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\pow}{\mathcal{P}}
+\newcommand{\form}{\textsc{Form}}
+\newcommand{\dom}{\text{dom}}
+\newcommand{\ran}{\text{ran}}
+
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\uh}{\upharpoonright}
+\newcommand{\irule}[3]{\inference[\textsc{#1}]{#2}{#3}}
+\newcommand{\cls}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\TODO}[1]{{\color{red}[TODO: #1]}}
+\newcommand{\needcite}{{\color{red}[?]}}
+
+\begin{document}
+
+\maketitle
+
+\section{Lecture 1}
+
+\emph{Material:} Section 2.4
+
+\subsection{Integers}
+
+\emph{Idea:} Represent $z \in \ZZ$ by $a - b = z$ with $a, b \in \NN$.
+
+\emph{Problem:} These $a, b \in \NN$ are not unique for $z \in \ZZ$.
+
+\begin{definition}[Equivalence class]
+  \
+  A relation $\sim \;\subseteq A \times A$ is an \emph{equivalence relation} if it is
+  \begin{itemize}
+  \item \emph{reflexive:} $a \sim a$,
+  \item \emph{symmetric:} $a \sim b$ entails $b \sim a$, and
+  \item \emph{transitive:} $a \sim b$ and $b \sim c$ entail $a \sim c$.
+  \end{itemize}
+  Given an equivalence relation $\sim \; \subseteq A \times A$ an \emph{equivalence
+  class} is:
+  \[
+    \llbracket a \rrbracket := \{b \in A \mid a \sim b\}
+  \]
+  and the \emph{quotient of $A$ by $\sim$} is $A_{/ \sim} := \{\llbracket a
+  \rrbracket \mid a \in A\}$.
+\end{definition}
+
+\begin{lemma}
+  $a \sim b$ iff $\cls{a} = \cls{b}$.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[$\to$:] We show $\cls{a} \subseteq \cls{b}$. Let $c \in \cls{a}$ then $c
+    \sim a \sim b$ and thus $c \in \cls{b}$.
+  \item[$\leftarrow$:] We know that $a \in \cls{a} = \cls{b}$ and thus $a \sim
+    b$ per definition of $\cls{b}$.
+  \end{description}
+\end{proof}
+
+\begin{definition}[Integers]
+  We fix $\ZZ := (\NN \times \NN)_{/ \sim}$ for
+  \(
+    (a, b) \sim (c, d) \text{ iff } a + d = c + b.
+  \)
+\end{definition}
+
+\begin{lemma}
+  This is an equivalence relation.
+\end{lemma}
+\begin{proof}
+  \
+  \begin{description}
+  \item[Reflexivity:] $(a, b) \sim (a, b) \leftrightarrow a + b = a + c$
+  \item[Symmetry:] $(a, b) \sim (c, d) \leftrightarrow a + d = c + b
+    \leftrightarrow c + b = a + d \leftrightarrow (c, d) \sim (a, b)$
+  \item[Transitivity:] Let $(a, b) \sim (c, d) \sim (e, f)$, then $a + d = c +
+    b$ and $c + f = e + d$. Together this yields $a + d + c + f = c + b + e +
+    d$, leaving $a + f = e + b$ and thus $(a, b) \sim (e, f)$.
+  \end{description}
+\end{proof}
+
+\begin{example}
+  For $n \in \NN$ we have $-n := \{(k, k + n) \mid k \in \NN\}$.
+\end{example}
+
+\begin{definition}
+  Let $\sim \subseteq X \times X$ be an equivalence relation. A function $f : X
+  \times \ldots \times X
+  \to Y$ is \emph{congruent} on $\sim$ if $a_1 \sim b_1, \ldots, a_n \sim b_n$
+  entails $f(a_1, \ldots, a_n) = f(b_1, \ldots, b_n)$. A relation $R \subseteq X
+  \times \ldots \times X$ is congruent on $\sim$ if for $a_1 \sim b_1, \ldots,
+  a_n \sim b_n$ we have $(a_1, \ldots, a_n) \in R$ iff $(b_1, \ldots, b_n) \in R$.
+\end{definition}
+
+\begin{lemma}
+  Let $f : X \times \ldots \times X \to Y$ be congruent on $\sim$. Then
+  \[
+    g \coloneq \{(A_1, \ldots, A_n, y) \in X_{/ \sim} \times \ldots \times X_{/
+      \sim} \times Y \mid \exists a_1 \in A_1, \ldots, a_n \in A_n.~y = f(a_1,
+    \ldots, a_n) \}
+  \]
+  is a function. We may thus write $g(\cls{a_1}, \ldots, \cls{a_n}) := f(a_1,
+  \ldots, a_n)$.
+\end{lemma}
+\begin{proof}
+  We must show that $g$ is a function. Thus fix $A_1, \ldots, A_n \in X_{/
+    \sim}$ and $y, y' \in Y$ such that $(A_1, \ldots, A_n, y), (A_1, \ldots,
+  A_n, y') \in g$. That means there are $a_i, b_i \in A_i$ such that $y = f(a_1,
+  \ldots, a_n)$ and $y' = f(b_1, \ldots, b_n)$. Because $a_i, b_i \in A_i \in
+  X_{/ \sim}$, we know that $a_i \sim b_i$. As f is congruent on $\sim$ that
+  means $y = f(\vec{a}) = f(\vec{b}) = y'$.
+\end{proof}
+
+\begin{remark}
+  Similarly, congruent relations induce well-defined relations on the quotient.
+\end{remark}
+
+\begin{definition}[Operations]
+  We define
+  \begin{itemize}
+  \item $\cls{(a, b)} <_\ZZ \cls{(c, d)}$ if $a + d < b + c$
+  \item $\cls{(a, b)} +_\ZZ \cls{(c, d)} := \cls{(a + c, b + d)}$
+  \item $\cls{(a, b)} \cdot_\ZZ \cls{(c, d)} := \cls{(ac + bd,bc + ad)}$
+  \item $\tilde{n} := \cls{(n, 0)}$ for $n \in \NN$
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}
+  Let $(a, b) \sim (a', b')$ and $(c, d) \sim (c', d')$ then $a + d < b + c$ iff
+  $a' + d' < b' + c'$.
+\end{proposition}
+\begin{proof}
+  We know that $(1)~a + b' = a' + b$ and $(2)~c + d' = c' + d$. Then
+  \begin{align*}
+    a + d &< b + c & +(1) \\
+    a + a' + b + d &< a + b + b' + c \\
+    a' + d &< b' + c & +(2) \\
+    a' + c + d + d' &< b' + c + c' + d \\
+    a' + d' &< b' + c'
+  \end{align*}
+\end{proof}
+
+\subsection{Rationals}
+
+\emph{Idea:} $q \in \QQ$ is $(a, b) \in \ZZ \times \ZZ^+$ such that $q = \frac a
+b$ where $\ZZ^+ = \{z \in \ZZ \mid z > \tilde{0}\}$.
+
+\begin{definition}
+  We take $\QQ := (\ZZ \times \ZZ^+)_{/ \sim}$ where $(a, b) \sim (c, d)$ if $ad
+  = bc$.
+
+  Further, we define the following:
+  \begin{itemize}
+  \item $\cls{(a, b)} <_\QQ \cls{(c, d)}$ if $ad <_\ZZ bc$
+  \item $\cls{(a, b)} +_\QQ \cls{(c, d)} := \cls{(ad + bc, bd)}$
+  \item $\cls{(a, b)} \cdot_\QQ \cls{(c, d)} := \cls{(ac, bd)}$
+  \item $\hat{z} := \cls{(z, \tilde{1})}$ for $z \in \ZZ$
+  \end{itemize}
+\end{definition}
+
+\begin{theorem}[Density]
+  For $\cls{(a, b)} < \cls{(c, d)} \in \QQ$ there is $\cls{(x,y)} \in \QQ$ such
+  that $\cls{(a, b)} < \cls{(x, y)} < \cls{(c, d)}$.
+\end{theorem}
+\begin{proof}
+  \emph{Intuitively}: Pick $\frac 1 2 (\frac a b + \frac c d)$.
+
+  Formally, that is
+  \[
+    \cls{(1, 2)} \cdot (\cls{(a, b)} + \cls{(c, d)}) = \cls{(1, 2)} \cdot
+    \cls{(ad + bc, bd)} = \cls{(ad + bc, 2bd)}
+  \]
+
+  Now
+  \[
+    \cls{(a, b)} < \cls{(ad + bc, 2bd)} \text{ iff } 2abd < b(ad + bc) = adb + b^2c
+  \]
+  but observe that $\cls{(a, b)} < \cls(c, d)$ means $ad < bc$ and thus
+  \[
+    2abd = abd + abd < abd + b^2c.
+  \]
+  Similarly,
+  \[
+    \cls{(ad + bc, 2bd)} < \cls{(c, d)} \text{ iff } d(ad + bc) = ad^2 + bcd < 2bcd
+  \]
+  which follows analogously from $ad < bc$.
+\end{proof}
+
+\newpage
+
+\section{Lecture 2}
+
+\emph{Material:} Section 2.2
+
+\subsection{Reals (Dedekind's construction)}
+
+\emph{Idea:} Real numbers `divide' the rationals uniquely into $(L, R)$
+
+\begin{example}
+  $\sqrt{2} = (\QQ_0^- \cup \{q \in \QQ^+ \mid q^2 < 2\}, \{q \in \QQ^+ \mid 2 < q^2 \})$.
+\end{example}
+
+\begin{observation}
+  We always have for such $(L, R)$ that $R = \ol{L} := \QQ \setminus L$, hence the $R$ is redundant.
+\end{observation}
+
+\begin{definition}[Dedekind real]
+  A Dedekind real number is $r \subseteq \QQ$ such that
+  \begin{enumerate}[(i)]
+  \item $\emptyset \subset r \subset \QQ$
+  \item \emph{left-closed:} If $p \in r$ then $q \in r$ for all $q < p$
+  \item \emph{no maximum:} If $p \in r$ then there is $q \in r$ with $p < q$
+  \end{enumerate}
+  We take $\RR := \{r \subseteq \QQ \mid r \text{ a Dedekind real}\}$
+\end{definition}
+
+\begin{example}
+  For $p \in \QQ$ we embed it into $\RR$ as $p_\RR := \{q \in \QQ \mid q < p\}$
+  \emph{not} $p \leq q$.
+
+  Hence, for rational numbers, they end up in $\ol{p_\RR}$ rather than $p_\RR$.
+  This is a choice.
+\end{example}
+
+\begin{proposition}
+  $q_\RR$ is a Dedekind real.
+\end{proposition}
+\begin{proof}
+  Everything but (iii) is obvious. For no maximum, let $p \in q_\RR$ then we
+  know by density of $\QQ$ that there is $p < x < q$ for which $x \in q_\RR$ follows.
+\end{proof}
+
+\begin{fact}
+  An $x \in \RR$ is $q_\RR$ for some $q \in \QQ$ iff $q \in \ol{x}$ is minimal.
+\end{fact}
+
+\begin{definition}
+  We take $r =_\RR s$ iff $r = s$ for $r, s \in \RR$. Similarly, $r \leq_\RR s$
+  iff $r \subseteq s$.
+\end{definition}
+
+\begin{fact}
+  $r \leq_\RR s$ is a linear order.
+\end{fact}
+
+For $X \subseteq \RR, y \in \RR$ write $X \leq y$ if $x \leq y$ for all $x \in X$.
+
+\begin{theorem}[Completeness]
+  Let $\emptyset \neq A \subseteq \RR$ be such that $A \leq b$ for some $b \in \RR$.
+  Then there exists $\sup A \in \RR$ such that $A \subseteq \sup A$ and for all
+  $A \leq c$ we have $\sup A \leq c$. We call $\sup A$ the \emph{least upper
+    bound} or \emph{supremum} of $A$.
+\end{theorem}
+\begin{proof}
+  Simply take $\sup A := \bigcup A$. First, $\sup A \in \RR$:
+  \begin{enumerate}[(i)]
+  \item $\sup A \neq \emptyset$ because some $r \in A$. $\sup A \neq \QQ$
+    because $\sup A \cap \ol{b} = \emptyset$.
+  \item If $p \in \sup A$ then $p \in a \in A$ and thus $p > q \in a$ and hence
+    $p \in \sup A$.
+  \item Analogous to (ii).
+  \end{enumerate}
+
+  Now, the supremum property. Let $A \leq c$, then $\sup A \leq c$, i.e.\ $\sup
+  A \subseteq c$. Let $p \in \sup A$ then $p \in a \in A$. As $a \leq c$ we thus
+  know that $p \in c$.
+\end{proof}
+
+\begin{observation}
+  $\QQ$ is famously incomplete. For example, $\sup \{q \in \QQ^+ \mid q^2 < 2\}
+  \not\in \QQ$.
+\end{observation}
+
+\begin{definition}
+  For $r, s \in \RR$ we define
+  \begin{itemize}
+  \item $r + s := \{p + q \mid p \in r, q \in s\}$
+  \item $r \cdot s :=
+    \begin{cases}
+      \{m < p \cdot q \mid p \in \ol{r}, q \in \ol{s}\} & r \leq 0, s \leq 0 \\
+      \{m < p \cdot q \mid p \in r, q \in \ol{s} \} & r \leq 0, s > 0 \\
+      \{m < p \cdot q \mid p \in \ol{r}, q \in s \} & r > 0, s \leq 0 \\
+      \{m < p \cdot q \mid p \in r_+, q \in s_+ \} \cup \QQ^-_0 & r > 0, s > 0 \\
+    \end{cases}
+    $
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}
+  $\sqrt{2}^2 = 2$
+\end{proposition}
+\begin{proof}
+  \begin{align*}
+    \sqrt{2}^2 & = \QQ^-_0 \cup \{m < p \cdot q \mid 0 < p, q \in \sqrt{2}\} \\
+               & = \QQ^-_0 \cup \{m < p \cdot q \mid 0 < p, q \wedge p^2 < 2, q^2 < 2\} \\
+               & = \QQ^-_0 \cup \{m < p^2 \mid 0 < p\wedge p^2 < 2\} \\
+               & = \QQ^-_0 \cup \{m < 2\} \\
+               & = \{q < 2\} = 2_\RR
+  \end{align*}
+\end{proof}
+
+\begin{proposition}
+  There is no surjection $c : \NN \to \RR$.
+\end{proposition}
+\begin{proof}
+  We construct a sequence $a_n < b_n$ such that $c(n) \not\in [a_{n + 1}, b_{n +
+  1}]$. Let
+  $a_0 = 0, b_n = 1$ then at each step $n$ consider, subdivide $[a_n, b_n]$ into
+  $a_n, \frac 1 3 (a_n + b_n), \frac 2 3 (a_n + b_n), b$ and pick the subinterval not
+  containing $c(n)$.
+
+  Formally, fix
+  \[
+    x_0 = a_n \quad x_1 = \frac 1 3 (a_n + b_n) \quad x_2 = \frac 2 3 (a_n +
+    b_n) \quad x_3 = b_n.
+  \]
+  We distinguish two cases:
+  \begin{description}
+  \item[$x_2 < c(n)$:] Then set $a_{n + 1} := x_0, b_{n + 1} := x_1$.
+  \item[otherwise:] Let $i := \min \{0 \leq i \leq 2 \mid c(n) < x_i\}$ and set
+    $a_{n + 1} := x_i, b_{n + 1} := x_{i + 1}$.
+  \end{description}
+  Observe that $a_n \leq a_{n + 1} < b_{n + 1} \leq b_n$ and $c(n) \not\in [a_{n
+  + 1}, b_{n + 1}]$.
+
+  Now consider $s := \sup \{a_n \mid n \in \NN\}$. Then $s \in [a_n, b_n]$ for
+  all $n \in \omega$: Observe that $b_n \geq b_{n + k} > a_{n + k}$, i.e.\ $b_n$
+  is an upper bound on the $a_n$, hence $s \leq b$ by completeness.
+
+  As $c$ is a surjection, there is $k$ s.t.\ $s = c(k)$. But $c(k) \not\in [a_{k
+  + 1},
+  b_{k + 1}]$ whereas $s \in [a_{k + 1}, b_{k + 1}]$.
+\end{proof}
+
+% \newpage
+
+% \section{Exercises}
+
+% \begin{exercise}
+%   Prove that multiplication in $\ZZ$ and $\QQ$ are well-defined, i.e. using a
+%   congruent function.
+% \end{exercise}
+% \begin{solution}
+%   \
+%   \begin{description}
+%   \item[$\QQ$:]
+%     Let $(a, b) \sim (a', b')$ and $(c, d) \sim (c', d')$. Then $ab' = a'b$ and
+%     $cd' = c'd$. Recall that
+%     \[
+%       \cls{(a, b)} \cdot_\QQ \cls{(c, d)} := \cls{(ac, bd)}.
+%     \]
+%     We want to show that $(ac, bd) \sim (a'c', b'd')$, i.e. that
+%     $acb'd' = a'c'bd$. This follows directly from multiplying the previous equations.
+
+%   \item[$\ZZ$:] Let $(a, b) \sim (a', b')$ and $(c, d) \sim (c', d')$. Then $a +
+%     b' = a' + b$ and $c + d' = c' + d$. Recall that
+%     \[
+%       \cls{(a, b)} \cdot_\ZZ \cls{(c, d)} := \cls{(ac + bd,bc + ad)}.
+%     \]
+%     We want to show that $(ac + bd, bc + ad) \sim (a'c' + b'd', b'c' + a'd')$,
+%     i.e. that
+%     \[
+%       ac + bd + b'c' + a'd' = a'c' + b'd' + bc + ad.
+%     \]
+%     Observe that
+%     \[
+%       a(c + d') + b(c' + d) = a(c' + d) + b(c + d') \text{ and } (a + b')c' +
+%       (a' + b)d' = (a' + b)c' + (a + b')d'
+%     \]
+%     because $c + d' = c' + d$ and $a + b' = a' + b$. Adding these two equations
+%     together yields exactly the desired equation (module canceling terms).
+
+%     \emph{Idea:} $ab$-equation proves the claim only for $(c, d) \sim (c', d')$.
+%   \end{description}
+% \end{solution}
+
+% \begin{exercise}[2.6]
+%   Prove that $\RR$ is not bounded from above.
+% \end{exercise}
+% \begin{solution}
+%   Suppose there was $x \in \RR$ such that $y \subseteq x$ for all $x \in \RR$.
+%   This means for each $q \in \QQ$, $(q + 1)_\RR \subseteq x$ and thus $q \in x$.
+%   But then $x = \QQ$, which means $x \not\in \RR$.
+% \end{solution}
+
+% \begin{exercise}[2.12]
+%   Show that $r + 0 = r$.
+% \end{exercise}
+% \begin{solution}
+%   Recall that $0 \in \RR$ is $\{q \in \QQ \mid q < 0 \}$. Then
+%   \begin{align*}
+%     r + 0 & = \{p + q \mid p \in r, q \in 0\} \\
+%     &= \{p + q \mid p \in r, q < 0\}
+%   \end{align*}
+%   \begin{description}
+%   \item[$r + 0 \subseteq r$:] For $p + q \in r + 0$ we know that $p + q < p$ and thus $p + q \in r$.
+%   \item[$r \subseteq r + 0$:] Let $p \in r$, then there must be $p' > p \in r$.
+%     Then $p - p' < 0$ and thus $p - p' \in 0$. Hence $p' + (p - p') = p \in r + 0$.
+%   \end{description}
+% \end{solution}
+
+\printbibliography{}
+
+\end{document}
