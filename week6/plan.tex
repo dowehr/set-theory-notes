@@ -82,10 +82,10 @@ the AC, but we shall lay the groundwork.
   Let $A, B$ be sets.
   \begin{itemize}
   \item $A$ and $B$ are \emph{equinumerous} if there is a bijection $f : A \to
-    B$. We write $A \simeq B$.
+    B$. We write $A \approx B$.
   \item $A$ is \emph{less than or equinumerous} with $B$ if there is an
     injection $f : A \to B$. We write $A \preceq B$.
-  \item $A$ is \emph{dominated} by $B$ if $A \preceq B$ but $A \not\simeq B$ We
+  \item $A$ is \emph{dominated} by $B$ if $A \preceq B$ but $A \not\approx B$. We
     write $A \prec B$.
   \end{itemize}
 \end{definition}
@@ -101,7 +101,7 @@ the AC, but we shall lay the groundwork.
 \end{lemma}
 
 \begin{lemma}
-  $\NN \simeq \ZZ$
+  $\NN \approx \ZZ$
 \end{lemma}
 \begin{proof}
   Consider the following bijection $b : \ZZ \to \NN$:
@@ -116,7 +116,7 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{lemma}
-  For $n \in \NN$ we have $\NN \simeq \NN \setminus \{n\}$.
+  For $n \in \NN$ we have $\NN \approx \NN \setminus \{n\}$.
 \end{lemma}
 \begin{proof}
   For the bijection, consider
@@ -131,7 +131,7 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{corollary}
-  If $A \subseteq \NN$ is finite then $\NN \simeq \NN \setminus A$.
+  If $A \subseteq \NN$ is finite then $\NN \approx \NN \setminus A$.
 \end{corollary}
 
 \begin{lemma}
@@ -151,7 +151,7 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{lemma}
-  $\simeq$ is an equivalence relation.
+  $\approx$ is an equivalence relation.
 \end{lemma}
 \begin{proof}
   \
@@ -175,7 +175,7 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{theorem}[Cantor-Schröder-Bernstein]
-  $\preceq$ is anti-symmetric. I.e.\ if $A \preceq B$ and $B \preceq A$ then $A \simeq B$.
+  $\preceq$ is anti-symmetric. I.e.\ if $A \preceq B$ and $B \preceq A$ then $A \approx B$.
 \end{theorem}
 \begin{proof}
   \emph{Na\"ive Idea:} Start with the surjection $h^* : A \to B$
@@ -237,12 +237,12 @@ the AC, but we shall lay the groundwork.
 \begin{proof}
   \
   \begin{description}
-  \item[irreflexive:] For any set $A$, $A \simeq A$ via $1_A : A \to A$.
-  \item[transitive:] Let $A \preceq B \preceq C$ with $A \not\simeq B \not\simeq
+  \item[irreflexive:] For any set $A$, $A \approx A$ via $1_A : A \to A$.
+  \item[transitive:] Let $A \preceq B \preceq C$ with $A \not\approx B \not\approx
     C$. We showed before that $A \preceq C$. Suppose, towards contradiction,
-    that $A \simeq C$. Then $B \preceq C \simeq A$ yields $B \preceq A$ (compose
+    that $A \approx C$. Then $B \preceq C \approx A$ yields $B \preceq A$ (compose
     the underlying functions!). But by Cantor-Schröder-Bernstein, $A \preceq B$
-    and $B \preceq A$ implies $A \simeq B$, contradicting our assumption.
+    and $B \preceq A$ implies $A \approx B$, contradicting our assumption.
   \end{description}
 \end{proof}
 
@@ -252,7 +252,7 @@ the AC, but we shall lay the groundwork.
 
 
 \begin{remark}
-  We have shown that under ZL, $\preceq$ is a total relation.
+  We have shown that under ZL, $\preceq$ is total.
 \end{remark}
 
 
@@ -263,20 +263,20 @@ the AC, but we shall lay the groundwork.
 \subsection*{Countability}
 
 \begin{definition}
-  $A$ is \emph{countable} if it is finite or $A \simeq \NN$. We say that $A$ is
-  countably infinite if $A \simeq \NN$. If a set is not countable, it is said to
+  $A$ is \emph{countable} if it is finite or $A \approx \NN$. We say that $A$ is
+  countably infinite if $A \approx \NN$. If a set is not countable, it is said to
   be \emph{uncountable}.
 \end{definition}
 
 \begin{theorem}
-  If $A \subseteq N$ then either $A$ is finite or $A \simeq \NN$.
+  If $A \subseteq N$ then either $A$ is finite or $A \approx \NN$.
 \end{theorem}
 \begin{proofsketch}
   Observe that either $A \subseteq n \in \NN$ or for every $n \in A$ there is an
   $m \in A$ with $n < m$.
   \begin{description}
   \item[$A \subseteq n$:] We can prove per induction on $n$ that there exists an
-    $m \leq n$ with $m \simeq n$.
+    $m \leq n$ with $m \approx n$.
   \item[Otherwise:] Consider $c : \Pi n \in A.~\{m \in A \mid n <
     m\}$ defined via
     \(
@@ -289,7 +289,7 @@ the AC, but we shall lay the groundwork.
 \end{proofsketch}
 
 \begin{lemma}
-  $\NN \times \NN \simeq \NN$
+  $\NN \times \NN \approx \NN$
 \end{lemma}
 \begin{proof}
   Recall that $1 + \ldots + n = \frac{n(n + 1)}{2}$. Then consider the bijection
@@ -298,17 +298,17 @@ the AC, but we shall lay the groundwork.
   \emph{Draw the picture.}
 \end{proof}
 \begin{remark}
-  The general statement that $A \simeq A \times A$ for infinite $A$ is
+  The general statement that $A \approx A \times A$ for infinite $A$ is
   equivalent to AC.
 \end{remark}
 
 \begin{corollary}
-  $\NN \simeq \QQ$
+  $\NN \approx \QQ$
 \end{corollary}
 \begin{proof}
    We use Cantor-Schröder-Bernstein. Clearly $\NN \preceq \QQ$. Recall also the bijection $b
    : \ZZ \to \NN$. Then we can define the $\preceq$-part of $\QQ \preceq \NN
-   \times \NN \simeq \NN$ as follows:
+   \times \NN \approx \NN$ as follows:
    \[
      i(\cls{(a, b)}) := (b(z), b(z')) \text{ for } (z, z') \in \cls{(a, b)}
      \text{ with least } z'
@@ -316,7 +316,7 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{theorem}
-  $\NN \simeq \ZZ \simeq \QQ$
+  $\NN \approx \ZZ \approx \QQ$
 \end{theorem}
 
 \begin{lemma}
@@ -353,11 +353,11 @@ the AC, but we shall lay the groundwork.
 \end{corollary}
 \begin{proof}
   We know that $\NN \preceq \RR$. We have also proven before that there can be no surjection
-  $\NN \to \RR$ and thus that $\NN \not\simeq \RR$.
+  $\NN \to \RR$ and thus that $\NN \not\approx \RR$.
 \end{proof}
 
 \begin{lemma}
-  $\pow(X) \simeq 2^X$
+  $\pow(X) \approx 2^X$
 \end{lemma}
 \begin{proof}
   Consider $\chi : \pow(X) \to 2^X$ given by
@@ -374,7 +374,7 @@ the AC, but we shall lay the groundwork.
   If $2 \preceq Y$ then $X \prec Y^X$.
 \end{lemma}
 \begin{proof}
-  Observe that $X \preceq \pow(X) \simeq 2^X \preceq Y^X$. Now suppose $b : X \simeq
+  Observe that $X \preceq \pow(X) \approx 2^X \preceq Y^X$. Now suppose $b : X \approx
   Y^X$. Consider the function $f : X \to Y$ defined as follows:
   \[
     f(x) :=
@@ -391,10 +391,10 @@ the AC, but we shall lay the groundwork.
 \end{corollary}
 
 \begin{lemma}
-  $\RR \simeq \pow(\QQ) \simeq 2^\NN \simeq \NN^\NN$.
+  $\RR \approx \pow(\QQ) \approx 2^\NN \approx \NN^\NN$.
 \end{lemma}
 \begin{proof}
-  We use CSB. We already know $\RR \preceq \pow(\QQ) \simeq \pow(\NN) \simeq
+  We use CSB. We already know $\RR \preceq \pow(\QQ) \approx \pow(\NN) \approx
   2^\NN$. It remains to find an injection $i : 2^\NN \to \RR$. Pick
   \[
     i(f) := \sup \left\{\left(\sum_{i = 0}^n \frac{f(i)}{10^i}\right)_\RR \mid n \in \NN\right\}
@@ -420,10 +420,10 @@ the AC, but we shall lay the groundwork.
 \end{proof}
 
 \begin{lemma}
-  $\RR \times \RR \simeq \RR$
+  $\RR \times \RR \approx \RR$
 \end{lemma}
 \begin{proof}
-  We show $2^\NN \times 2^\NN \simeq 2^\NN$ instead. Then simply consider
+  We show $2^\NN \times 2^\NN \approx 2^\NN$ instead. Then simply consider
   \[
     b(f, g) := n \mapsto
     \begin{cases}
